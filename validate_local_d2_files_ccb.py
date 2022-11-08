@@ -10,6 +10,7 @@ import numpy as np
 source_volume_config = r"\\allen\programs\braintv\workgroups\nc-ophys\corbettb\NP_behavior_pipeline\source_list.json"
 with open(source_volume_config, 'r') as f:
     sources = json.load(f)
+sources = [s for s in sources if os.path.exists(s)]
 
 # configuring how to find paths to the sorting data
 default_sorting_directory = 'E' 
