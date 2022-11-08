@@ -8,7 +8,7 @@ import os, glob
 import json
 import re
 
-def get_sessions(root, mouseID=None, start_date=None, end_date=None, rig=None, day1=True, limsID=None, limslength=[10]):
+def get_sessions(root, mouseID=None, start_date=None, end_date=None, rig=None, day1=True, limsID=None, limslength=[10], with_qc=None):
     '''Gets ephys sessions from root directory. 
     Takes only the directories in root with the expected format:
         10 digit lims ID, 6 digit mouseID and 8 digit date
@@ -21,6 +21,8 @@ def get_sessions(root, mouseID=None, start_date=None, end_date=None, rig=None, d
                     date format needs to be 'YYYYMMDD'
         end_date: take all dates before or on this
         rig: which rig experiment was run on ('NP0', 'NP1' most likely)
+        with_qc: True/False take only sessions with/without QC, respectively
+                (not applied if None)
     ''' 
     if isinstance(root, list):
         in_dir = concatenate_lists([list_dir(r) for r in root])
@@ -31,8 +33,8 @@ def get_sessions(root, mouseID=None, start_date=None, end_date=None, rig=None, d
                                   and validate_session_dir(d, limslength))]
     
     for func, criterion in zip([mouseID_filter, start_date_filter, 
-                                end_date_filter, rig_filter, day1_filter, limsID_filter],
-                               [mouseID, start_date, end_date, rig, day1, limsID]):
+                                end_date_filter, rig_filter, day1_filter, limsID_filter, with_qc_filter],
+                               [mouseID, start_date, end_date, rig, day1, limsID, with_qc]):
         dirs = apply_filter(dirs, func, criterion)
 
     return dirs
@@ -125,6 +127,16 @@ def limsID_filter(d, limsID):
     d_limsID = re.match(str(limsID), base)
     
     return (d_limsID is not None) and len(limsID)>8
+
+
+def with_qc_filter(d, with_qc):
+    return d
+#     QC_ROOT = "//allen/programs/braintv/workgroups/nc-ophys/corbettb/NP_behavior_pipeline/QC"
+#     base = os.path.basename(d)
+#     if os.path.exists()
+#     d_limsID = re.match(str(limsID), base)
+    
+#     return (d_limsID is not None) and len(limsID)>8
     
     
 def apply_filter(dirs, filter_func, criterion):
