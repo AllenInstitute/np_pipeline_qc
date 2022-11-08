@@ -60,9 +60,10 @@ def transfer_session(session_base_dir, probes_to_run = 'ABCDEF', rig_dir_dict=No
     return_string = []
     try: 
         rig = get_rig(session_base_dir)
-        
         if rig_dir_dict:
             lims_dir = rig_dir_dict[rig]
+        elif all(folder in session_base_dir for folder in ['workgroups', 'mindscope', 'np-exp']):
+            lims_dir = r"\\allen\programs\mindscope\workgroups\np-exp\outbox"
         else:
             lims_dir = rig_limsdirectory_dict[rig]
         

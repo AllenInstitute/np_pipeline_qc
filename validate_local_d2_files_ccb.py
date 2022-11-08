@@ -103,6 +103,12 @@ def validate_d2_files(sessionID, acq_computer_name):
         expected_probe_base = os.path.join(acq_computer_name, 
                                             default_sorting_directory,
                                             default_probe_directory_format.format(sessionID, probe))
+        
+        if not os.path.exists(expected_probe_base):
+            expected_probe_base = os.path.join(r"\\allen\programs\mindscope\workgroups\np-exp",
+                                               sessionID,default_probe_directory_format.format(sessionID, probe))
+        
+        
         probe_base = glob.glob(expected_probe_base)
         print(os.path.normpath(expected_probe_base))
         
