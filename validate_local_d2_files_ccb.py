@@ -58,7 +58,7 @@ def get_inserted_probes_from_platformD1json(network_dir):
         with open(platform_json_file[0], 'r') as f:
             pj = json.load(f)
         #print(pj)
-        insertion_notes = pj['InsertionNotes']
+        insertion_notes = pj.get('InsertionNotes', [])
         #print('printing insertion notes')
         #print(insertion_notes)
         for p in probe_keys:
