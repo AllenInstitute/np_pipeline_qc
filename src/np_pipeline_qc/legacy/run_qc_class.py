@@ -888,8 +888,8 @@ class run_qc_passive(run_qc):
 
         base_dir = os.path.dirname(self.SYNC_FILE)
         mapping_pkl = glob.glob(
-            os.path.join(base_dir, '*stim.pkl')
-        ) + glob.glob(os.path.join(base_dir, '*PASSIVE*.pkl'))
+            os.path.join(base_dir, '*mapping.pkl') # added for ttn
+        ) + glob.glob(os.path.join(base_dir, '*stim.pkl')) + glob.glob(os.path.join(base_dir, '*PASSIVE*.pkl'))
         self.MAPPING_PKL = mapping_pkl[0]
         print('Found mapping pkl: {}'.format(mapping_pkl))
         self.mapping_data = pd.read_pickle(self.MAPPING_PKL)
