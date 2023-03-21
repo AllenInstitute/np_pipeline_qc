@@ -403,7 +403,9 @@ class run_qc:
             print('Error getting platform json: {}'.format(e))
 
     def _get_agar_channels(self):
-
+        if self.probeinfo_dict is None:
+            self._build_probeinfo_dict()
+        
         self.agar_channel_dict = {}
         for pid in self.probes_to_run:
             self.agar_channel_dict[pid] = analysis.find_agar_channels(
@@ -504,7 +506,9 @@ class run_qc:
         )
 
     def probe_noise(self, data_chunk_size=1):
-
+        if self.probeinfo_dict is None:
+            self._build_probeinfo_dict()
+        
         noise_dir = os.path.join(self.FIG_SAVE_DIR, 'probe_noise')
         analysis.plot_AP_band_noise(
             self.probe_dirs,
@@ -517,6 +521,10 @@ class run_qc:
 
     def probe_yield(self):
         ### Plot Probe Yield QC ###
+        if self.metrics_dict is None:
+            self._build_metrics_dict()
+        if self.probeinfo_dict is None:
+            self._build_probeinfo_dict()
 
         probe_yield_dir = os.path.join(self.FIG_SAVE_DIR, 'probe_yield')
         if not os.path.exists(probe_yield_dir):
