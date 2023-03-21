@@ -1,4 +1,5 @@
-from copy_d2_lims_files_for_upload import transfer_session
+from np_pipeline_qc.legacy.copy_d2_lims_files_for_upload import \
+    transfer_session
 
 sessions_to_copy = [r"\\10.128.54.20\sd8.3\1118324999_576324_20210728",
     r"\\10.128.54.20\sd8.3\1118512505_576324_20210729",

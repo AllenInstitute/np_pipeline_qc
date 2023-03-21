@@ -5,15 +5,19 @@ Created on Tue Sep  8 09:03:21 2020
 @author: svc_ccg
 """
 
-from get_sessions import get_sessions
-import subprocess
-import re, glob, os
+import datetime
+import glob
+import os
 import pickle
+import re
+import subprocess
+
 import numpy as np
 import scipy.ndimage
 import scipy.signal
 from matplotlib import pyplot as plt
-import datetime
+
+from np_pipeline_qc.legacy.get_sessions import get_sessions
 
 sources = [r"\\10.128.50.43\sd6.3", r"\\10.128.50.20\sd7", r"\\10.128.50.20\sd7.2", r"\\10.128.54.20\sd8"]
 sessionsToRun = get_sessions(sources, mouseID='!366122', start_date='20200930')#, end_date='20200922')

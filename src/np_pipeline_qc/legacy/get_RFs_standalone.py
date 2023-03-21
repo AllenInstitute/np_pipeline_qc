@@ -4,23 +4,24 @@ Created on Sat Jul 11 17:25:46 2020
 
 @author: svc_ccg
 """
-import numpy as np
+import argparse
+import logging
 import os
+import pickle
+import sys
+
+import matplotlib.gridspec as gridspec
+import numpy as np
 #from visual_behavior.ophys.sync import sync_dataset
 import pandas as pd
-from matplotlib import pyplot as plt
-import matplotlib.gridspec as gridspec
-import analysis
-import probeSync_qc as probeSync
-import data_getters
-import logging
-import sys
-from analysis import save_figure
-import pickle
-# sys.path.append("..")
-from sync_dataset import Dataset as sync_dataset
 import scipy.signal
-import argparse
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy import analysis, data_getters
+from np_pipeline_qc.legacy.analysis import save_figure
+# sys.path.append("..")
+from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 
 
 def get_RFs(probe_dict, mapping_data, first_frame_offset, FRAME_APPEAR_TIMES, 

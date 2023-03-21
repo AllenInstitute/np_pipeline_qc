@@ -1,10 +1,12 @@
-import os
-import json
-from collections import namedtuple, OrderedDict 
 import glob
-import pandas as pd
-import get_sessions as gs
+import json
+import os
+from collections import OrderedDict, namedtuple
+
 import numpy as np
+import pandas as pd
+
+import np_pipeline_qc.legacy.get_sessions as gs
 
 # This specifies where to look for our network backups
 source_volume_config = r"\\allen\programs\braintv\workgroups\nc-ophys\corbettb\NP_behavior_pipeline\source_list.json"

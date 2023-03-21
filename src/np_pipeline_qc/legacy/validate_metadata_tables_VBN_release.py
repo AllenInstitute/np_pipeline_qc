@@ -4,16 +4,18 @@ Created on Fri Apr 29 15:22:24 2022
 
 @author: svc_ccg
 """
-import pandas as pd
-import numpy as np
 import decimal  # bleh
+import glob
+import json
+import os
+from contextlib import contextmanager
+
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import url
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session
-from contextlib import contextmanager
-import glob, os, json
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 ADAPTER = "sqlserver"
 DATASERVER = "AILABTRACKS\SQLEXPRESS"

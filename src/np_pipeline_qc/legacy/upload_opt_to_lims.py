@@ -5,12 +5,15 @@ Created on Thu Oct 22 18:26:10 2020
 @author: svc_ccg
 """
 
-import requests
-import os, json, glob
-import datetime
-import subprocess
-import shutil
 import argparse
+import datetime
+import glob
+import json
+import os
+import shutil
+import subprocess
+
+import requests
 from psycopg2 import connect, extras
 
 

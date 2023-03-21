@@ -4,17 +4,18 @@ Created on Wed Dec 16 12:31:11 2020
 
 @author: svc_ccg
 """
-import numpy as np
-from sync_dataset import Dataset as sync_dataset
 from collections import OrderedDict
-import visual_behavior.analyze
-import pandas as pd
-import probeSync_qc as probeSync
-import data_getters
-import build_stim_tables
-import h5py
-from query_lims import query_lims
+
 import cv2
+import h5py
+import numpy as np
+import pandas as pd
+import visual_behavior.analyze
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy import build_stim_tables, data_getters
+from np_pipeline_qc.legacy.query_lims import query_lims
+from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 
 eye_cam_dict = {'Eye': 'RawEyeTrackingVideo',
                         'Face': 'RawFaceTrackingVideo', 

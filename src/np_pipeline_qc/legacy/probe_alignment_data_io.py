@@ -5,16 +5,16 @@ Created on Thu Jul 15 17:39:32 2021
 @author: svc_ccg
 """
 
-import numpy as np
-import os, glob
+import glob
 import json
 import logging
-import pandas as pd
-import time
-import json
+import os
 import re
+import time
 import urllib.request as request
 
+import numpy as np
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 

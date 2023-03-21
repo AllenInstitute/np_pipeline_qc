@@ -5,9 +5,11 @@ Created on Thu Mar 10 11:47:34 2022
 @author: svc_ccg
 """
 
-import pandas as pd
+import glob
+import os
+
 import numpy as np
-import os, glob
+import pandas as pd
 
 structure_tree = pd.read_csv(r"\\allen\programs\mindscope\workgroups\np-behavior\ccf_structure_tree_2017.csv")
 labels = np.load(r"C:\Users\svc_ccg\Desktop\Data\Atlas\annotation_volume_10um_by_index.npy")

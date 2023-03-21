@@ -1,14 +1,14 @@
 
-import os
-import json
-import pprint
-#from recordclass import recordclass
-from collections import namedtuple, OrderedDict 
 import glob
+import json
 import logging
+import os
+import pprint
 import shutil
-import pandas as pd
+#from recordclass import recordclass
+from collections import OrderedDict, namedtuple
 
+import pandas as pd
 
 logging.basicConfig(level=logging.WARNING)
 save_dir = r"\\allen\programs\braintv\workgroups\nc-ophys\corbettb\NP_behavior_pipeline\sorted_data_validation_results"

@@ -1,12 +1,14 @@
+import glob
+import os
 from multiprocessing import Pool
-import os, glob
-from pynwb import NWBHDF5IO
-from allensdk.brain_observatory.ecephys.behavior_ecephys_session import (
-    BehaviorEcephysSession)
-from numba import njit
+
 import numpy as np
 import pandas as pd
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
+    BehaviorEcephysSession
 from matplotlib import pyplot as plt
+from numba import njit
+from pynwb import NWBHDF5IO
 
 
 @njit     

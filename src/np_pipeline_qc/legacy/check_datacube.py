@@ -5,14 +5,18 @@ Created on Wed Jan 13 09:46:23 2021
 @author: svc_ccg
 """
 
-from run_qc_class import run_qc
-from matplotlib import pyplot as plt
-import pandas as pd
-import get_sessions as gs
-import json, os, glob
+import glob
+import json
+import os
+
 import numpy as np
-from lims_validation import run_validation
-from query_lims import query_lims
+import pandas as pd
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.get_sessions as gs
+from np_pipeline_qc.legacy.lims_validation import run_validation
+from np_pipeline_qc.legacy.query_lims import query_lims
+from np_pipeline_qc.legacy.run_qc_class import run_qc
 
 #TODO: LOGGING!!! 
 source_volume_config = r"\\allen\programs\braintv\workgroups\nc-ophys\corbettb\NP_behavior_pipeline\source_list.json"

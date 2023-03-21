@@ -4,15 +4,18 @@ Created on Tue Apr 26 23:46:31 2022
 
 @author: svc_ccg
 """
-import os, glob
-from pynwb import NWBHDF5IO
-from allensdk.brain_observatory.ecephys.behavior_ecephys_session import (
-    BehaviorEcephysSession)
-from numba import njit
+import glob
+import os
+
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 import scipy.signal
+from allensdk.brain_observatory.ecephys.behavior_ecephys_session import \
+    BehaviorEcephysSession
+from matplotlib import pyplot as plt
+from numba import njit
+from pynwb import NWBHDF5IO
+
 
 @njit     
 def makePSTH_numba(spikes, startTimes, windowDur, binSize=0.001, convolution_kernel=0.05, avg=True):

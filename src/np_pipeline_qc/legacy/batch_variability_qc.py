@@ -4,12 +4,14 @@ Created on Tue Jan 18 17:39:33 2022
 
 @author: svc_ccg
 """
-import get_sessions as gs
 import os
-from run_qc_class import run_qc_passive
-from matplotlib import pyplot as plt
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.get_sessions as gs
+from np_pipeline_qc.legacy.run_qc_class import run_qc_passive
 
 #TODO: LOGGING!!! 
 

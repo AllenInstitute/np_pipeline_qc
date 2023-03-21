@@ -5,11 +5,13 @@ Created on Thu Mar 11 15:48:00 2021
 @author: svc_ccg
 """
 
-import get_sessions as gs
 import os
-import EcephysBehaviorSession as ebs
-import pandas as pd
 import shutil
+
+import pandas as pd
+
+import np_pipeline_qc.legacy.EcephysBehaviorSession as ebs
+import np_pipeline_qc.legacy.get_sessions as gs
 
 #TODO: LOGGING!!! 
 

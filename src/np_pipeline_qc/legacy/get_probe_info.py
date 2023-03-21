@@ -5,12 +5,16 @@ Created on Fri Jan 15 17:57:05 2021
 @author: svc_ccg
 """
 
-from run_qc_class import run_qc
-from matplotlib import pyplot as plt
+import glob
+import json
+import os
+
 import pandas as pd
-import get_sessions as gs
-import json, os, glob
-import probeSync_qc as probeSync
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.get_sessions as gs
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy.run_qc_class import run_qc
 
 #TODO: LOGGING!!! 
 

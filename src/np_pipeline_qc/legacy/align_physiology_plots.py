@@ -6,15 +6,17 @@ Created on Sun Feb 27 17:27:45 2022
 """
 
 import sys
+
 sys.path.append(r"C:\Users\svc_ccg\Documents\GitHub\AIBSOPT_VBN\Software\Analysis")
-from align_to_physiology import align_to_physiology
+import glob
+import os
 
-
-import EcephysBehaviorSession as ebs
-import os, glob
-import pandas as pd
-import analysis
 import numpy as np
+import pandas as pd
+
+import np_pipeline_qc.legacy.EcephysBehaviorSession as ebs
+from np_pipeline_qc.legacy import analysis
+from np_pipeline_qc.legacy.align_to_physiology import align_to_physiology
 
 df = pd.read_excel(r"C:\Users\svc_ccg\ccb_onedrive\OneDrive - Allen Institute\all_np_behavior_mice.xlsx")
 opt_data_dir = r'\\allen\programs\mindscope\workgroups\np-behavior\processed_ALL'

@@ -4,17 +4,17 @@ Created on Wed May 11 10:49:18 2022
 
 @author: svc_ccg
 """
-from sync_dataset import Dataset
-import pandas as pd
-import numpy as np
 import os
-import probeSync_qc as probeSync
-import ecephys
+
+import numpy as np
+import pandas as pd
+from allensdk.brain_observatory.ecephys.file_io.stim_file import \
+    CamStimOnePickleStimFile
 from matplotlib import pyplot as plt
-import build_stim_tables
-from allensdk.brain_observatory.ecephys.file_io.stim_file import (
-    CamStimOnePickleStimFile,
-)
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy import build_stim_tables, ecephys
+from np_pipeline_qc.legacy.sync_dataset import Dataset
 
 behavior_data = pd.read_pickle(r"C:\Users\svc_ccg\Desktop\VBN_timing_test\220510180649.pkl")
 mapping_data = pd.read_pickle(r"C:\Users\svc_ccg\Desktop\VBN_timing_test\220510183227-script.pkl")

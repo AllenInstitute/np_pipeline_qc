@@ -1,9 +1,10 @@
 import os
-import pandas as pd
+
 import numpy as np
-from allensdk.brain_observatory.sync_dataset import \
-    Dataset as SyncDataset
-from allensdk.brain_observatory.ecephys.align_timestamps.barcode import extract_barcodes_from_times, get_probe_time_offset
+import pandas as pd
+from allensdk.brain_observatory.ecephys.align_timestamps.barcode import (
+    extract_barcodes_from_times, get_probe_time_offset)
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 from matplotlib import pyplot as plt
 
 # GET DATA

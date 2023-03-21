@@ -5,21 +5,25 @@ Created on Wed Mar 10 11:13:19 2021
 @author: svc_ccg
 """
 
-from collections import OrderedDict
-import analysis
-import numpy as np
-from matplotlib import pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.gridspec as gridspec
-import scipy.stats
-import matplotlib as mpl
-from numba import njit
-import sklearn
-from sklearn.model_selection import cross_validate, cross_val_score, cross_val_predict
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import LinearSVC
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import warnings
+from collections import OrderedDict
+
+import matplotlib as mpl
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as patches
+import numpy as np
+import scipy.stats
+import sklearn
+from matplotlib import pyplot as plt
+from numba import njit
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import (cross_val_predict, cross_val_score,
+                                     cross_validate)
+from sklearn.svm import LinearSVC
+
+from np_pipeline_qc.legacy import analysis
+
 mpl.rcParams['pdf.fonttype'] = 42
 
 change_times = stim_table.loc[stim_table['change']==1, 'Start'].values
@@ -306,9 +310,11 @@ def get_all_change_responses(df, image_list, orderbydepth=False):
 
   
 
-import EcephysBehaviorSession as ebs
 import os
+
 import pandas as pd
+
+import np_pipeline_qc.legacy.EcephysBehaviorSession as ebs
 
 h5_dir = r"C:\Data\NP_pipeline_h5s"
 h5_list = [os.path.join(h5_dir, h) for h in os.listdir(h5_dir)]
@@ -360,6 +366,7 @@ combined_stim_df['stim_session_index'] = combined_stim_df.index.astype(str) + '_
 
 ### save combined DFs ###
 import h5py
+
 savepath = r"C:\Data\NP_pipeline_h5s\popdata_with_times.h5"
 with h5py.File(savepath,'a') as savefile:
     grp = savefile['/']

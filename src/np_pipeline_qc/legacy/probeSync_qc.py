@@ -6,20 +6,25 @@ Created on Wed Aug 08 13:08:37 2018
 """
 
 from __future__ import division
-from matplotlib import pyplot as plt
-import ecephys
-import pandas as pd
-import numpy as np
-import glob, os, json, re
-import logging
-from xml.dom.minidom import parse
-import visual_behavior
-import pdb
 
+import glob
+import json
+import logging
+import os
+import pdb
+import re
 #for vsync alignment
 from typing import Union
+from xml.dom.minidom import parse
+
 import numpy as np
+import pandas as pd
 import scipy.spatial.distance as distance
+import visual_behavior
+from matplotlib import pyplot as plt
+
+from np_pipeline_qc.legacy import ecephys
+
 
 def getUnitData(probeBase,syncDataset):
 

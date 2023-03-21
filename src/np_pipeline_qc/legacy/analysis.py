@@ -4,25 +4,29 @@ Created on Sat Feb 22 14:18:35 2020
 
 @author: svc_ccg
 """
-import numpy as np
-from matplotlib import pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.ticker import FormatStrFormatter
-import matplotlib.patches as mpatches
-import os, json, shutil, re
-import analysis
-from numba import njit
-import visual_behavior
-from get_sessions import glob_file
-import ecephys
-from probeSync_qc import get_sync_line_data
-import probeSync_qc as probeSync
+import copy
+import json
+import os
+import re
+import shutil
+
 import cv2
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as mpatches
+import numpy as np
 import pandas as pd
 import plotly
 import plotly.tools as tls
 import scipy.signal
-import copy
+import visual_behavior
+from matplotlib import pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
+from numba import njit
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy import ecephys
+from np_pipeline_qc.legacy.get_sessions import glob_file
+from np_pipeline_qc.legacy.probeSync_qc import get_sync_line_data
 
 probe_color_dict = {'A': 'orange',
                         'B': 'r',
@@ -347,7 +351,7 @@ def plot_lick_triggered_LFP(lfp_dict, agar_chan_dict, lick_times, FIG_SAVE_DIR, 
         agarChRange = np.array(agar_chan_dict[p]).astype(int)
         print('Using agar range {} for probe {}'.format(agarChRange, p))
         
-        lta, lta_filt, ltime, first_lick_times = analysis.lickTriggeredLFP(lick_times, plfp, lfp_dict[p]['time'], 
+        lta, lta_filt, ltime, first_lick_times = lickTriggeredLFP(lick_times, plfp, lfp_dict[p]['time'], 
                                                agarChRange=agarChRange, num_licks=20, windowBefore=windowBefore,
                                                windowAfter=windowAfter, min_inter_lick_time=0.5)
         
@@ -666,7 +670,7 @@ def plot_population_change_response(probe_dict, behavior_start_frame, replay_sta
                 if s.size>3600:
                     for icts, cts in enumerate([active_change_times, passive_change_times]): 
                         if len(cts)>0:
-                            sdf,t = analysis.plot_psth_change_flashes(cts, s, preTime=preTime, postTime=postTime)
+                            sdf,t = plot_psth_change_flashes(cts, s, preTime=preTime, postTime=postTime)
                             sdfs[icts].append(sdf)
          
             # plot population change response
@@ -736,7 +740,7 @@ def plot_change_response_DR(probe_dict, behavior_start_frame,
                     for icts, cts in enumerate(block_change_times): 
                         if len(cts)>0:
                             
-                            sdf,t = analysis.plot_psth_change_flashes(cts, s, preTime=preTime, postTime=postTime)
+                            sdf,t = plot_psth_change_flashes(cts, s, preTime=preTime, postTime=postTime)
                             sdfs[icts].append(sdf)
          
             # plot population change response

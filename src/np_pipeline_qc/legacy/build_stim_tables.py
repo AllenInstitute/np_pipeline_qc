@@ -5,17 +5,22 @@ Created on Tue Jul 14 18:50:27 2020
 @author: svc_ccg
 """
 
-import pandas as pd
-from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations
-from allensdk.brain_observatory.sync_dataset import Dataset
-from allensdk.brain_observatory.ecephys.stimulus_table.ephys_pre_spikes import build_stimuluswise_table, create_stim_table, make_spontaneous_activity_tables
-from allensdk.brain_observatory.ecephys.file_io.stim_file import (
-    CamStimOnePickleStimFile,
-)
-import probeSync_qc as probeSync
-from functools import partial
-import numpy as np
 import logging
+from functools import partial
+
+import numpy as np
+import pandas as pd
+from allensdk.brain_observatory.behavior.stimulus_processing import \
+    get_stimulus_presentations
+from allensdk.brain_observatory.ecephys.file_io.stim_file import \
+    CamStimOnePickleStimFile
+from allensdk.brain_observatory.ecephys.stimulus_table.ephys_pre_spikes import (
+    build_stimuluswise_table, create_stim_table,
+    make_spontaneous_activity_tables)
+from allensdk.brain_observatory.sync_dataset import Dataset
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+
 
 def get_frame_offsets(sync_dataset, frame_counts, tolerance=0):
     ''' Tries to infer which vsyncs correspond to the frames in the epochs in frame_counts

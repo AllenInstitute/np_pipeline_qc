@@ -5,8 +5,12 @@ Created on Thu Feb 10 18:12:27 2022
 @author: svc_ccg
 """
 
-from D1_LIMS_schema import D1_translator
-import glob, os, subprocess, json
+import glob
+import json
+import os
+import subprocess
+
+from np_pipeline_qc.legacy.D1_LIMS_schema import D1_translator
 
 sessions_to_run = []
 

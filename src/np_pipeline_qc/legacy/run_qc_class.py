@@ -12,20 +12,22 @@ Created on Fri Jul 10 15:42:31 2020
 @author: svc_ccg
 """
 
-import numpy as np
-import os, glob, shutil
+import glob
 import json
-import behavior_analysis
-#from visual_behavior.ophys.sync import sync_dataset
-from sync_dataset import Dataset as sync_dataset
+import logging
+import os
+import shutil
+
+import numpy as np
 import pandas as pd
-import analysis
-import probeSync_qc as probeSync
-import data_getters
-from get_RFs_standalone import get_RFs
-import logging 
-from query_lims import query_lims
-from task1_behavior_session import DocData
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy import analysis, behavior_analysis, data_getters
+from np_pipeline_qc.legacy.get_RFs_standalone import get_RFs
+from np_pipeline_qc.legacy.query_lims import query_lims
+#from visual_behavior.ophys.sync import sync_dataset
+from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
+from np_pipeline_qc.legacy.task1_behavior_session import DocData
 
 
 class run_qc():
@@ -292,9 +294,6 @@ class run_qc():
 
     def _get_agar_channels(self):
         
-        if self.probeinfo_dict is None:
-            self._build_probeinfo_dict()
-        
         self.agar_channel_dict = {}
         for pid in self.probes_to_run:
             self.agar_channel_dict[pid] = analysis.find_agar_channels(self.probeinfo_dict[pid])
@@ -356,8 +355,6 @@ class run_qc():
 
 
     def probe_noise(self, data_chunk_size=1):
-        if self.probeinfo_dict is None:
-            self._build_probeinfo_dict()
         
         noise_dir = os.path.join(self.FIG_SAVE_DIR, 'probe_noise')
         analysis.plot_AP_band_noise(self.probe_dirs, self.probes_to_run, self.probeinfo_dict, 
@@ -366,10 +363,7 @@ class run_qc():
         
     def probe_yield(self):
         ### Plot Probe Yield QC ###
-        if self.metrics_dict is None:
-            self._build_metrics_dict()
-        if self.probeinfo_dict is None:
-            self._build_probeinfo_dict()
+
 
         probe_yield_dir = os.path.join(self.FIG_SAVE_DIR, 'probe_yield')
         if not os.path.exists(probe_yield_dir):

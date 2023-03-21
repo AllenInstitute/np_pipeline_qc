@@ -5,11 +5,14 @@ Created on Fri Sep  4 13:38:00 2020
 @author: svc_ccg
 """
 
-import get_sessions as gs
-import os, re
-import lims_validation as lv
-from lims_validation import lims_validation
 import datetime
+import os
+import re
+
+import np_pipeline_qc.legacy.get_sessions as gs
+import np_pipeline_qc.legacy.lims_validation as lv
+from np_pipeline_qc.legacy.lims_validation import lims_validation
+
 #TODO: LOGGING!!! 
 
 rigs_to_check = ['NP1', 'NP0']

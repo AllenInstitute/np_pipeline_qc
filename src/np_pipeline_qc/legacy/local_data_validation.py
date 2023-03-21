@@ -5,9 +5,13 @@ Created on Fri Sep 11 16:55:19 2020
 @author: svc_ccg
 """
 
-from D1_local_schema import D1_schema
+import glob
+import json
 #from D2_LIMS_schema import D2_schema
-import os, sys, json, glob
+import os
+import sys
+
+from np_pipeline_qc.legacy.D1_local_schema import D1_schema
 
 
 def run_local_validation(local_dir):

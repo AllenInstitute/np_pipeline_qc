@@ -4,12 +4,12 @@ Created on Fri Oct  9 09:30:06 2020
 
 @author: svc_ccg
 """
-import os
-from run_qc_class import run_qc
-from run_qc_class import run_qc_hab
-from run_qc_class import run_qc_passive
-import run_qc_class
 import argparse
+import os
+
+import np_pipeline_qc.legacy.run_qc_class
+from np_pipeline_qc.legacy.run_qc_class import (run_qc, run_qc_hab,
+                                                run_qc_passive)
 
 #TODO: LOGGING!!! 
 

@@ -5,9 +5,14 @@ Created on Tue Jun  9 14:33:49 2020
 @author: svc_ccg
 """
 
+import glob
+import json
+import os  # , shutil
+
 from psycopg2 import connect, extras
-import os, glob, json #, shutil
-from D1_local_schema import D1_schema as D1_local
+
+from np_pipeline_qc.legacy.D1_local_schema import D1_schema as D1_local
+
 
 class data_getter():
     ''' parent class for data getter, should be able to 

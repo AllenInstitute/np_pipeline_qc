@@ -5,12 +5,14 @@ Created on Mon Nov 29 13:39:59 2021
 @author: svc_ccg
 """
 
-import pandas as pd
 import os
-import EcephysBehaviorSession as ebs
-from matplotlib import pyplot as plt
+
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
 from numba import njit
+
+import np_pipeline_qc.legacy.EcephysBehaviorSession as ebs
 
 
 def get_ctx_inds(unit_table):

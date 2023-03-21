@@ -5,11 +5,14 @@ Created on Fri Feb 25 15:27:14 2022
 @author: svc_ccg
 """
 
-import EcephysBehaviorSession as ebs
-import os, glob
-import pandas as pd
-import analysis
+import glob
+import os
+
 import numpy as np
+import pandas as pd
+
+import np_pipeline_qc.legacy.EcephysBehaviorSession as ebs
+from np_pipeline_qc.legacy import analysis
 
 df = pd.read_excel(r"C:\Users\svc_ccg\ccb_onedrive\OneDrive - Allen Institute\all_np_behavior_mice.xlsx")
 opt_data_dir = r'\\allen\programs\mindscope\workgroups\np-behavior\processed_ALL'

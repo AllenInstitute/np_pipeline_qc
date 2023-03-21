@@ -4,9 +4,11 @@ Created on Mon Aug 10 14:20:34 2020
 
 @author: svc_ccg
 """
-import os, glob
+import glob
 import json
+import os
 import re
+
 
 def get_sessions(root, mouseID=None, start_date=None, end_date=None, rig=None, day1=True, limsID=None, limslength=[10], with_qc=None):
     '''Gets ephys sessions from root directory. 

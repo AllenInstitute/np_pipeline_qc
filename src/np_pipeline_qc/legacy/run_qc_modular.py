@@ -5,21 +5,22 @@ Created on Fri Jul 10 15:42:31 2020
 @author: svc_ccg
 """
 
-import numpy as np
-import os, glob, shutil
-import behavior_analysis
-#from visual_behavior.ophys.sync import sync_dataset
-from sync_dataset import Dataset as sync_dataset
-import pandas as pd
-from matplotlib import pyplot as plt
-import analysis
-import probeSync_qc as probeSync
-import scipy.signal
-import cv2
-import data_getters
-from get_RFs_standalone import get_RFs
+import glob
+import logging
+import os
+import shutil
 
-import logging 
+import cv2
+import numpy as np
+import pandas as pd
+import scipy.signal
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
+from np_pipeline_qc.legacy import analysis, behavior_analysis, data_getters
+from np_pipeline_qc.legacy.get_RFs_standalone import get_RFs
+#from visual_behavior.ophys.sync import sync_dataset
+from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 
 ### SPECIFY EXPERIMENT TO PULL ####
 #this should be either the ten digit lims id:

@@ -6,15 +6,18 @@ Created on Fri Jan  7 17:20:54 2022
 """
 
 import os
+
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.stats
-import matplotlib
-import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
-from matplotlib.backends.backend_pdf import PdfPages
-from analysis import save_figure
+
+from np_pipeline_qc.legacy.analysis import save_figure
+
 matplotlib.rcParams['pdf.fonttype'] = 42
 
 

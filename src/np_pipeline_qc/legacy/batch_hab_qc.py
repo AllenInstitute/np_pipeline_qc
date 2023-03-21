@@ -11,11 +11,13 @@ Created on Wed Aug 12 19:09:46 2020
 @author: svc_ccg
 """
 
-import get_sessions as gs
 import os
-from run_qc_class import run_qc_hab
-from matplotlib import pyplot as plt
+
 import pandas as pd
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.get_sessions as gs
+from np_pipeline_qc.legacy.run_qc_class import run_qc_hab
 
 #TODO: LOGGING!!! 
 

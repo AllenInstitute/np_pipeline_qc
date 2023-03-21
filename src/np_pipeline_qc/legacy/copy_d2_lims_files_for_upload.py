@@ -4,11 +4,14 @@ Created on Mon Sep 14 17:08:13 2020
 
 @author: svc_ccg
 """
-import os, glob, re, sys
-from collections import namedtuple, OrderedDict
-import subprocess
-import logging
+import glob
 import json
+import logging
+import os
+import re
+import subprocess
+import sys
+from collections import OrderedDict, namedtuple
 
 #source_dir = r"\\10.128.50.43\sd6.3\1047969464_509808_20200902"
 

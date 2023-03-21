@@ -5,12 +5,15 @@ Created on Wed Aug 12 19:09:46 2020
 @author: svc_ccg
 """
 
-import get_sessions as gs
-import os, json
-from run_qc_class import run_qc
-from matplotlib import pyplot as plt
-import pandas as pd
+import json
+import os
+
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.get_sessions as gs
+from np_pipeline_qc.legacy.run_qc_class import run_qc
 
 #TODO: LOGGING!!! 
 

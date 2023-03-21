@@ -4,11 +4,15 @@ Created on Thu Sep  3 09:44:09 2020
 
 @author: svc_ccg
 """
-import data_getters
-from D1_LIMS_schema import D1_schema
-from D2_LIMS_schema import D2_schema
+import json
+import os
+import sys
+
 from psycopg2 import connect, extras
-import os, sys, json
+
+from np_pipeline_qc.legacy import data_getters
+from np_pipeline_qc.legacy.D1_LIMS_schema import D1_schema
+from np_pipeline_qc.legacy.D2_LIMS_schema import D2_schema
 
 
 def run_validation(lims_id, savePath=None):

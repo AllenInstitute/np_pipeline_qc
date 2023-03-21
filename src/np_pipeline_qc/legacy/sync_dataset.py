@@ -15,12 +15,14 @@ h5py   http://www.h5py.org/
 
 """
 import collections
+
+import h5py as h5
+import numpy as np
+
 #import datetime
 #import pprint
 #from ctypes import c_ulong
 
-import h5py as h5
-import numpy as np
 
 dset_version = 1.04  #TODO: get rid of this.
 

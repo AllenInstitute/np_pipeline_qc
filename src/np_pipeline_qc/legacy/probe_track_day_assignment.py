@@ -4,16 +4,18 @@ Created on Thu Jul 15 11:27:48 2021
 
 @author: svc_ccg
 """
-import pandas as pd
-import numpy as np
-import os, json
-import get_sessions as gs
-from matplotlib import pyplot as plt
 import glob
-import cv2
-import query_lims
-import probe_alignment_data_io as data_io
+import json
+import os
 
+import cv2
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+
+import np_pipeline_qc.legacy.get_sessions as gs
+import np_pipeline_qc.legacy.probe_alignment_data_io as data_io
+from np_pipeline_qc.legacy import query_lims
 
 annotation_df = pd.read_excel(r"C:\Users\svc_ccg\ccb_onedrive\OneDrive - Allen Institute\VBN_annotation.xlsx")
 angles = {'A': [-14.21405475, -12.3231693,  -58.84145942],

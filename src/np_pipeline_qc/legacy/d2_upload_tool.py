@@ -1,16 +1,20 @@
-from lims_validation import run_validation
-from copy_d2_lims_files_for_upload import transfer_session
-from validate_local_d2_files_ccb import validate_d2_files
-import get_sessions as gs
-import numpy as np
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPalette, QColor
-import cv2
-import os, glob
+import glob
+import json
+import os
 import subprocess
 from datetime import datetime
-import json
+
+import cv2
+import numpy as np
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import QColor, QPalette
+from PyQt5.QtWidgets import *
+
+import np_pipeline_qc.legacy.get_sessions as gs
+from np_pipeline_qc.legacy.copy_d2_lims_files_for_upload import \
+    transfer_session
+from np_pipeline_qc.legacy.lims_validation import run_validation
+from np_pipeline_qc.legacy.validate_local_d2_files_ccb import validate_d2_files
 
 # sources = [r"\\10.128.50.43\sd6.3", 
 #            r"\\10.128.50.20\sd7", r"\\10.128.50.20\sd7.2", 

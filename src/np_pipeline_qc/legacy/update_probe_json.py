@@ -5,13 +5,17 @@ Created on Thu Feb 24 10:43:24 2022
 @author: svc_ccg
 """
 
-import pandas as pd
-import os, glob, json
-import numpy as np
-from analysis import glob_file, read_json
-from validate_local_d2_files import get_inserted_probes_from_platformD1json
+import glob
+import json
+import os
 import shutil
 
+import numpy as np
+import pandas as pd
+
+from np_pipeline_qc.legacy.analysis import glob_file, read_json
+from np_pipeline_qc.legacy.validate_local_d2_files import \
+    get_inserted_probes_from_platformD1json
 
 df = pd.read_excel(r"C:\Users\svc_ccg\ccb_onedrive\OneDrive - Allen Institute\all_np_behavior_mice.xlsx")
 depth_adjustments = pd.read_excel(r"C:\Users\svc_ccg\ccb_onedrive\OneDrive - Allen Institute\VBN_probe_depth_adjustments.xlsx")
