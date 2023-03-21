@@ -1,4 +1,88 @@
-[tool.pdm]
+[project]
+name = "np_pipeline_qc"
+version = "0.0.1"
+description = "Analysis and visualization code for quality-control of Neuropixels pipeline data."
+authors = [
+    { name = "corbennett", email = "corbettb@alleninstitute.org" },
+    { name = "bjhardcastle", email = "ben.hardcastle@alleninstitute.org" },
+]
+dependencies = [
+    "np-session>=0.4.26",
+    # "packaging==21.3",
+    # "scikit-image>=0.20.0",
+    # "h5py>=3.8.0",
+    # "numpy>=1.24.0",
+    # "pandas>=1.5.3",
+    # "tables>=3.8.0",
+    # "pytz==2022.7.1",
+    # "opencv-python>=4.7.0",
+    # "nest-asyncio>=1.5.6",
+    # "marshmallow>=3.10.0",
+    # "visual-behavior @ git+https://github.com/AllenInstitute/visual_behavior_analysis.git",
+    "allensdk>=1.2.0",
+    "pandas>=1.5.3",
+    "statsmodels>=0.13.5",
+    "tables>=3.8.0",
+    "visual-behavior @ git+https://github.com/AllenInstitute/visual_behavior_analysis.git",
+    "cython>=0.29.33",
+    "scikit-image>=0.20.0",
+    "h5py>=3.8.0",
+    "numba>=0.56.4", # not 3.11 compatible
+    "numpy==1.23.5",
+    "aiohttp>=3.8.4",
+    "markupsafe==2.0.0",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+
+[tool.pdm.resolution.overrides]
+scikit-image = ">=0.20.0"
+# packaging = ">=21.3"
+aiohttp = ">=3.8.0"
+llvmlite = ">=0.39.1"
+numba = ">=0.56.4"
+h5py = ">=3.8.0"
+numpy = ">=1.23.0, <1.24.0"
+statsmodels = ">=0.13.5"
+pandas = ">=1.5.3"
+tables = ">=3.8.0"
+pytz = "2022.7.1"
+redis = ">=4.5.2"
+async-timeout = ">=4.0.0"
+# opencv-python = ">=4.7.0"
+# nest-asyncio = ">=1.5.6"
+# marshmallow = ">=3.10.0"
+# pytz = "https://mypypi.org/packages/pytz-2020.9-py3-none-any.whl"  # absolute URL
+
+[project.license]
+text = "MIT"
+
+#   scikit-image 0.16.2 failed
+#   h5py 2.10.0 failed
+#   matplotlib 3.5.3 failed
+#   pandas None -> 0.25.3 failed
+#   statsmodels 0.13.0 failed
+#   tables 3.6.1 failed
+#   opencv-python 4.7.0 failed
+#   numpy 1.24.2 -> 1.18.5 failed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [tool.pdm.dev-dependencies]
 dev = [
     "blue>=0.9.1",
@@ -7,22 +91,8 @@ dev = [
     "pytest>=7.2.2",
 ]
 
-[project]
-name = "np_pipeline_qc"
-version = "0.0.1"
-description = ""
-authors = [
-    {name = "corbennett", email = "corbettb@alleninstitute.org"},
-    {name = "bjhardcastle", email = "ben.hardcastle@alleninstitute.org"},
-]
-dependencies = [
-    "np-session>=0.4.25",
-    "pandas>=1.5.3",
-]
-requires-python = ">=3.11"
-readme = "README.md"
-license = {text = "MIT"}
-
 [build-system]
-requires = ["pdm-pep517>=1.0"]
+requires = [
+    "pdm-pep517>=1.0",
+]
 build-backend = "pdm.pep517.api"
