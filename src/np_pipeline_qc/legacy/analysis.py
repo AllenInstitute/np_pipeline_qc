@@ -753,10 +753,13 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
         print(ind)
         axes[ind].plot(vs, 0.5 * np.ones(len(vs)), '|')
         axes[ind].plot(dvs, 0.5 * np.ones(len(dvs)), '|', ms=20)
-
-        sd.plot_bit(4, son - 1, son + 2, axes=axes[ind], auto_show=False)
-        sd.plot_bit(5, son - 1, son + 2, axes=axes[ind], auto_show=False)
-        axes[ind].set_xlim([son - 1, son + 2])
+        
+        # focus on the start of vsyncs if they occur well after the stim-TTL onset
+        x0, x1 = max(son - 1, vs[0] - 1), max(son + 2, vs[0] + 2)
+        
+        sd.plot_bit(4, x0, x1, axes=axes[ind], auto_show=False)
+        sd.plot_bit(5, x0, x1, axes=axes[ind], auto_show=False)
+        axes[ind].set_xlim([x0, x1])
         axes[ind].legend(['vsyncs', 'diode_vsyncs', 'diode', 'stim_running'])
         axes[ind].get_legend().remove()
     save_figure(
@@ -779,9 +782,12 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
         axes[ind].plot(vs, 0.5 * np.ones(len(vs)), '|')
         axes[ind].plot(dvs, 0.5 * np.ones(len(dvs)), '|', ms=20)
 
-        sd.plot_bit(4, soff - 2, soff + 1, axes=axes[ind], auto_show=False)
-        sd.plot_bit(5, soff - 2, soff + 1, axes=axes[ind], auto_show=False)
-        axes[ind].set_xlim([soff - 2, soff + 1])
+        # focus on the end of vsyncs if they occur well before the stim-TTL offset
+        x0, x1 = min(soff - 2, vs[-1] - 2), min(soff + 1, vs[-1] + 1)
+        
+        sd.plot_bit(4, x0, x1, axes=axes[ind], auto_show=False)
+        sd.plot_bit(5, x0, x1, axes=axes[ind], auto_show=False)
+        axes[ind].set_xlim([x0, x1])
         axes[ind].legend(['vsyncs', 'diode_vsyncs', 'diode', 'stim_running'])
         axes[ind].get_legend().remove()
 
