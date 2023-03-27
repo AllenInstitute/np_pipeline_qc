@@ -746,7 +746,7 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
     # plot beginning of stims
     fig, axes = plt.subplots(len(stim_ons))
     if not isinstance(axes, list):
-        axes = [axes]
+        axes = list(axes)
 
     fig.suptitle('Stim Starts')
     for ind, (son, vs, dvs) in enumerate(zip(stim_ons, vsyncs, diode_vsyncs)):
@@ -769,7 +769,7 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
     # plot end of stims
     fig, axes = plt.subplots(len(stim_offs))
     if not isinstance(axes, list):
-        axes = [axes]
+        axes = list(axes)
 
     fig.suptitle('Stim Ends')
     for ind, (soff, vs, dvs) in enumerate(
