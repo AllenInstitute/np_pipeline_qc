@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 
 import np_pipeline_qc.legacy.probeSync_qc as probeSync
+import np_pipeline_qc.reports as reports
 from np_pipeline_qc.legacy import analysis, behavior_analysis, data_getters
 from np_pipeline_qc.legacy.get_RFs_standalone import get_RFs
 from np_pipeline_qc.legacy.query_lims import query_lims
@@ -126,6 +127,11 @@ class run_qc:
             p for p in self.probes_to_run if p in self.paths['data_probes']
         ]
         self._run_modules()
+        if self.modules_to_run == 'all':
+            self._generate_report()
+
+    def _generate_report(self):
+        reports.session_qc_dir_to_img_html(self.FIG_SAVE_DIR)
 
     def _module_validation_decorator(data_streams):
         """Decorator to handle calling the module functions below and supplying

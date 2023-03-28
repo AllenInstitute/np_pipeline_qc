@@ -1,0 +1,1 @@
+from np_pipeline_qc.reports.qc2html import session_qc_dir_to_img_html
