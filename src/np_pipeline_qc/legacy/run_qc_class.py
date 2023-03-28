@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import shutil
+from typing import Literal, Sequence
 
 import np_session
 import numpy as np
@@ -29,6 +30,7 @@ from np_pipeline_qc.legacy.get_RFs_standalone import get_RFs
 from np_pipeline_qc.legacy.query_lims import query_lims
 from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 from np_pipeline_qc.legacy.task1_behavior_session import DocData
+from np_pipeline_qc.sorted import spike_depths
 
 
 class run_qc:
@@ -584,6 +586,13 @@ class run_qc:
             self.paths, unit_metrics_dir, prefix=self.figure_prefix
         )
 
+    def spike_depths(self):
+        ### Spike Depths ###
+        spike_depths_dir = os.path.join(self.FIG_SAVE_DIR, 'probe_yield', 'unit_distribution')
+        spike_depths.save_spike_depth_map_all_probes(
+            self.session.npexp_path, spike_depths_dir, prefix=self.figure_prefix,
+        )
+    
     @_module_validation_decorator(data_streams=['sync'])
     def probeSyncAlignment(self):
         ### Probe/Sync alignment
