@@ -31,24 +31,25 @@ from np_pipeline_qc.legacy.task1_behavior_session import DocData
 
 
 class run_qc:
-    
+
+    modules_to_run: Literal['all'] | Sequence[str] = 'all'
+    cortical_sort = False
+    probes_to_run = 'ABCDEF'
+    ctx_units_percentile = 50
+
     def __init__(
         self,
         exp_id,
         save_root,
-        modules_to_run='all',
-        cortical_sort=False,
-        probes_to_run='ABCDEF',
-        ctx_units_percentile=50,
+        **kwargs,
     ):
-        
+
         self.session = np_session.Session(exp_id)
-        
-        self.modules_to_run = modules_to_run
+
+        for _ in kwargs:
+            setattr(self, _, kwargs[_])
+
         self.errors = []
-        self.cortical_sort = cortical_sort
-        self.genotype = None
-        self.ctx_units_percentile = ctx_units_percentile
 
         self.data_stream_status = {
             'pkl': [False, self._load_pkl_data],
@@ -61,7 +62,7 @@ class run_qc:
         identifier = exp_id
         if identifier.find('_') >= 0:
             d = data_getters.local_data_getter(
-                base_dir=identifier, cortical_sort=cortical_sort
+                base_dir=identifier, cortical_sort=self.cortical_sort
             )
         else:
             d = data_getters.lims_data_getter(exp_id=identifier)
@@ -122,7 +123,7 @@ class run_qc:
         #        self._make_session_meta_json()
 
         self.probes_to_run = [
-            p for p in probes_to_run if p in self.paths['data_probes']
+            p for p in self.probes_to_run if p in self.paths['data_probes']
         ]
         self._run_modules()
 
