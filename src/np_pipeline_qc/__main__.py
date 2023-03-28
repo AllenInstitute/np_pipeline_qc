@@ -10,8 +10,11 @@ from np_pipeline_qc.legacy import run_qc_class
 logger = np_logging.getLogger(__name__)
 
 
-def run_qc(session: int | str | np_session.Session) -> None:
-    if not isinstance(session,  np_session.Session):
+def run_qc(
+    session: int | str | np_session.Session,
+    **kwargs,
+) -> None:
+    if not isinstance(session, np_session.Session):
         session = np_session.Session(session)
 
     logger.info(
@@ -19,19 +22,19 @@ def run_qc(session: int | str | np_session.Session) -> None:
     )
 
     cls: Type[run_qc_class.run_qc]
-    
+
     if session.is_hab:
         cls = run_qc_class.run_qc_hab
     elif session.project in np_session.Projects.DR.value:
         cls = run_qc_class.DR1
     else:
         cls = run_qc_class.run_qc_passive
-    
+
     # instantiating runs qc
-    # str(`id`) > lims 
-    cls(str(session.npexp_path), str(session.qc_path.parent))
-    
-    
+    # str(`id`) > lims
+    cls(str(session.npexp_path), str(session.qc_path.parent), **kwargs)
+
+
 if __name__ == '__main__':
 
     logger = np_logging.getLogger()
@@ -42,7 +45,7 @@ if __name__ == '__main__':
         type=np_session.Session,
         help='A lims session ID, or a string/path containing one',
     )
-     
+
     #! session = parser.parse_args().session
     session = np_session.Session(np_session.Projects.TTN.get_latest_ephys())
 
