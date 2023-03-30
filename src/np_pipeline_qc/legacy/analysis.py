@@ -27,6 +27,7 @@ import np_pipeline_qc.legacy.probeSync_qc as probeSync
 from np_pipeline_qc.legacy import ecephys
 from np_pipeline_qc.legacy.get_sessions import glob_file
 from np_pipeline_qc.legacy.probeSync_qc import get_sync_line_data
+from np_pipeline_qc.legacy.sync_dataset import Dataset as SyncDataset
 
 probe_color_dict = {
     'A': 'orange',
@@ -806,7 +807,64 @@ def get_monitor_lag(syncDataset):
 
     return lag
 
+def plot_diode_measured_sync_square_flips(
+    sd: SyncDataset, FIG_SAVE_DIR: str, prefix: str = '',
+    ) -> None:
+    """Plot the diode-measured sync-square changes that should occur every 1 s while stim is running."""
+    stim_ons, stim_offs = probeSync.get_stim_starts_ends(
+        sd
+    )   # These are the on and off times for each stimulus (behavior, mapping, replay)
+    
+    # we want the diode flips that occur after the stim-running TTL goes high
+    # and after the vsyncs start
+    all_diode_flips = np.concatenate([sd.get_rising_edges(4, units='seconds'), sd.get_falling_edges(4, units='seconds')])
+    all_vsyncs = sd.get_falling_edges(2, units='seconds')
 
+    # get the intervals in parts (one for each stimulus)
+    diode_flips_per_stim = []
+    for son, soff in zip(stim_ons, stim_offs):
+        # get the vsyncs that occur during this stimulus
+        vsyncs = all_vsyncs[np.where((all_vsyncs > son) & (all_vsyncs < soff))]
+        # get the diode flips that occur during this stimulus, while vsyncs are occurring
+        diode_flips = all_diode_flips[np.where(
+            (all_diode_flips > son) & (all_diode_flips < soff)
+            & (all_diode_flips > vsyncs[0]) & (all_diode_flips < vsyncs[-1])
+            )]
+        diode_flips_per_stim.append(sorted(diode_flips))
+
+    fig, axes = plt.subplots(1, len(stim_ons), sharey=True)
+    fig.set_tight_layout(False)
+    fig.suptitle('diode-measured sync-square\nflip intervals, 1 s expected')
+    if not isinstance(axes, list):
+        axes = list(axes)
+    y_deviations_from_one = []    
+    for idx, (ax, d) in enumerate(zip(axes, diode_flips_per_stim)):
+        plt.sca(ax)
+        intervals = np.diff(d)
+        times = np.diff(d) / 2 + d[:-1]
+        markerline, stemline, baseline = plt.stem(times, intervals, bottom=1.)
+        plt.setp(stemline, linewidth=.5, alpha=.3)
+        plt.setp(markerline, markersize=.5)
+        plt.setp(baseline, visible=False)
+        # plt.setp(baseline, linewidth=.5, c='k', alpha=.3, linestyle='--')
+        
+        y_deviations_from_one.extend(abs(1 - x) for x in ax.get_ylim())
+        ax.set_title(f'visual stim {idx}')
+        ax.set_xlabel('time (s)')
+        if idx == 0:
+            ax.set_ylabel('flip interval (s)')
+        
+    for ax in axes: 
+        # after all ylims are established
+        # center y-axis on 1.0
+        dy_max = max(y_deviations_from_one)
+        ax.set_ylim([1-dy_max, 1+dy_max])
+        ax.set_aspect((np.diff(ax.get_xlim()) / np.diff(ax.get_ylim()))[0])
+    
+    prefix += '_' if not prefix.endswith('_') else ''
+    fig.savefig(os.path.join(FIG_SAVE_DIR, prefix + 'sync_square_flip_intervals.png')) 
+    
+    
 def plot_frame_intervals(
     vsyncs,
     behavior_frame_count,

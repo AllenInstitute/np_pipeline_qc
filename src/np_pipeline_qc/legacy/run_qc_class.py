@@ -1019,16 +1019,11 @@ class run_qc_passive(run_qc):
     def vsyncs(self):
         ### Plot vsync info ###
         vsync_save_dir = os.path.join(self.FIG_SAVE_DIR, 'vsyncs')
-        # analysis.plot_frame_intervals(
-        #             self.vf,
-        #             self.behavior_frame_count,
-        #             self.mapping_frame_count,
-        #             self.behavior_start_frame,
-        #             self.mapping_start_frame,
-        #             self.replay_start_frame,
-        #             vsync_save_dir,
-        #             prefix=self.figure_prefix,
-        #         )
+        analysis.plot_diode_measured_sync_square_flips(
+                self.syncDataset,
+                vsync_save_dir,
+                prefix=self.figure_prefix,
+                )
         analysis.plot_vsync_interval_histogram(
             self.vf, vsync_save_dir, prefix=self.figure_prefix
         )
