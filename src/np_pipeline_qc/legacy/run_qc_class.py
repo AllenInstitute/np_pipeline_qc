@@ -32,6 +32,7 @@ from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 from np_pipeline_qc.legacy.task1_behavior_session import DocData
 from np_pipeline_qc.sorted import spike_depths
 
+logger = logging.getLogger(__name__)
 
 class run_qc:
 
@@ -39,6 +40,8 @@ class run_qc:
     cortical_sort = False
     probes_to_run = 'ABCDEF'
     ctx_units_percentile = 50
+    debug = False
+    """Raise errors encountered in modules if True."""
 
     def __init__(
         self,
@@ -416,7 +419,7 @@ class run_qc:
     def _get_agar_channels(self):
         if self.probeinfo_dict is None:
             self._build_probeinfo_dict()
-        
+
         self.agar_channel_dict = {}
         for pid in self.probes_to_run:
             self.agar_channel_dict[pid] = analysis.find_agar_channels(
@@ -519,7 +522,7 @@ class run_qc:
     def probe_noise(self, data_chunk_size=1):
         if self.probeinfo_dict is None:
             self._build_probeinfo_dict()
-        
+
         noise_dir = os.path.join(self.FIG_SAVE_DIR, 'probe_noise')
         analysis.plot_AP_band_noise(
             self.probe_dirs,
@@ -778,7 +781,7 @@ class run_qc:
             opto_dir,
             prefix=self.figure_prefix,
             opto_sample_rate=10000,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -913,9 +916,11 @@ class run_qc_passive(run_qc):
             self._load_sync_data()
 
         base_dir = os.path.dirname(self.SYNC_FILE)
-        mapping_pkl = glob.glob(
-            os.path.join(base_dir, '*mapping.pkl') # added for ttn
-        ) + glob.glob(os.path.join(base_dir, '*stim.pkl')) + glob.glob(os.path.join(base_dir, '*PASSIVE*.pkl'))
+        mapping_pkl = (
+            glob.glob(os.path.join(base_dir, '*mapping.pkl'))  # added for ttn
+            + glob.glob(os.path.join(base_dir, '*stim.pkl'))
+            + glob.glob(os.path.join(base_dir, '*PASSIVE*.pkl'))
+        )
         self.MAPPING_PKL = mapping_pkl[0]
         print('Found mapping pkl: {}'.format(mapping_pkl))
         self.mapping_data = pd.read_pickle(self.MAPPING_PKL)
@@ -1014,9 +1019,16 @@ class run_qc_passive(run_qc):
     def vsyncs(self):
         ### Plot vsync info ###
         vsync_save_dir = os.path.join(self.FIG_SAVE_DIR, 'vsyncs')
-        #        analysis.plot_frame_intervals(self.vf, self.behavior_frame_count, self.mapping_frame_count,
-        #                                      self.behavior_start_frame, self.mapping_start_frame,
-        #                                      self.replay_start_frame, vsync_save_dir, prefix=self.figure_prefix)
+        # analysis.plot_frame_intervals(
+        #             self.vf,
+        #             self.behavior_frame_count,
+        #             self.mapping_frame_count,
+        #             self.behavior_start_frame,
+        #             self.mapping_start_frame,
+        #             self.replay_start_frame,
+        #             vsync_save_dir,
+        #             prefix=self.figure_prefix,
+        #         )
         analysis.plot_vsync_interval_histogram(
             self.vf, vsync_save_dir, prefix=self.figure_prefix
         )
@@ -1053,7 +1065,10 @@ class run_qc_passive(run_qc):
                     else:
                         func()
                 except Exception as e:
-                    print('Error running module {}'.format(module))
+                    if self.debug:
+                        raise e
+                    logger.info('Error running module %s', module)
+                    logger.debug(e, exc_info=True)
                     self.errors.append((module, e))
 
 
