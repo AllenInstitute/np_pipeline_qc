@@ -3,6 +3,7 @@ import concurrent.futures
 import contextlib
 import doctest
 import functools
+import logging
 import os
 import pathlib
 import re
@@ -17,7 +18,7 @@ import numpy.typing as npt
 
 from np_pipeline_qc import utils
 
-logger = np_logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 SAMPLE_RATE = 30000.0
@@ -38,6 +39,7 @@ def generate_and_save_spike_depth_array_single_probe(continuous_AP_dir) -> None:
 
 
 def save_spike_depth_array_all_probes(parent_dir: pathlib.Path, skip_existing: bool = True) -> None:
+    futures: list[concurrent.futures.Future] = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         for continuous_AP_dir in utils.sorted_continuous_AP_dirs(parent_dir):
             probe_letter = utils.get_probe_letter_group_from_path(continuous_AP_dir)
@@ -46,21 +48,28 @@ def save_spike_depth_array_all_probes(parent_dir: pathlib.Path, skip_existing: b
                 logger.info(f'Skipping generation: {spike_depths_path.relative_to(parent_dir)} already exists')
                 continue
             logger.debug(f'Generating {spike_depths_path.relative_to(parent_dir)}')
-            executor.submit(generate_and_save_spike_depth_array_single_probe, continuous_AP_dir)
+            futures.append(executor.submit(generate_and_save_spike_depth_array_single_probe, continuous_AP_dir))
+    for future in futures:
+        if future.exception() is not None:
+            raise future.exception()
 
-
-@numba.njit(error_model='numpy')
+# @numba.njit(error_model='numpy')
+# @numba.jit
 def calculate_spike_depths(
-    sparse_features,
-    sparse_features_ind,
-    spike_templates,
-    spike_times,
-    channel_positions,
+    sparse_features = np.array([[[]]], dtype=np.float32),
+    sparse_features_ind = np.array([[]], dtype=np.uint32),
+    spike_templates = np.array([], dtype=np.uint32),
+    spike_times = np.array([], dtype=np.float64),
+    channel_positions = np.array([[]], dtype=np.float64),
 ) -> npt.NDArray:
-
-    channel_idx = sparse_features_ind[spike_templates].astype(np.uint32)
+    
+    channel_idx = np.array([[]], dtype=np.uint32)
+    ypos = np.array([[]], dtype=np.float64)
+    features = np.array([[]], dtype=np.float32)
+    
+    channel_idx = sparse_features_ind[spike_templates, :].astype(np.uint32)
+    ypos = channel_positions[:, 1][channel_idx]
     features = np.maximum(sparse_features[:, :, 0], 0) ** 2 # takes only +ve values into account
-    ypos = channel_positions[channel_idx, 1]
     # with np.errstate(divide='ignore'):
     return np.sum(
         np.transpose(ypos * features) / np.sum(features, axis=1),
@@ -115,9 +124,9 @@ def get_spike_depth_array_single_probe(
         continuous_AP_dir
     )
     return calculate_spike_depths(*arrays_for_spike_depth_calc)
-    with contextlib.suppress(Exception):
-        return calculate_spike_depths(*arrays_for_spike_depth_calc)
-    return low_mem_calc_spike_depths(*arrays_for_spike_depth_calc)
+    # with contextlib.suppress(Exception):
+    #     return calculate_spike_depths(*arrays_for_spike_depth_calc)
+    # return low_mem_calc_spike_depths(*arrays_for_spike_depth_calc)
 
 # @functools.lru_cache(maxsize=1)
 def get_arrays_for_spike_depth_calc(
@@ -137,11 +146,11 @@ def get_arrays_for_spike_depth_calc(
     return tuple(future.result() for future in futures)
 
 
-def get_sparse_features_ind(continuous_AP_dir) -> npt.NDArray:
+def get_sparse_features_ind(continuous_AP_dir) -> npt.NDArray[np.uint32]:
     return np.load(continuous_AP_dir / 'pc_feature_ind.npy', mmap_mode='r')
 
 
-def get_sparse_features(continuous_AP_dir) -> npt.NDArray:
+def get_sparse_features(continuous_AP_dir) -> npt.NDArray[np.float32]:
     pc_features: npt.NDArray = np.load(
         continuous_AP_dir / 'pc_features.npy', mmap_mode='r'
     )
@@ -150,7 +159,7 @@ def get_sparse_features(continuous_AP_dir) -> npt.NDArray:
     return sparse_features
 
 
-def get_spike_templates(continuous_AP_dir) -> npt.NDArray:
+def get_spike_templates(continuous_AP_dir) -> npt.NDArray[np.uint32]:
     spike_templates: npt.NDArray = np.load(
         continuous_AP_dir / 'spike_templates.npy', mmap_mode='r'
     )[:, 0]
@@ -158,7 +167,7 @@ def get_spike_templates(continuous_AP_dir) -> npt.NDArray:
     return spike_templates
 
 
-def get_spike_times(continuous_AP_dir) -> npt.NDArray:
+def get_spike_times(continuous_AP_dir) -> npt.NDArray[np.float64]:
     spike_times: npt.NDArray = np.load(
         continuous_AP_dir / 'spike_times.npy', mmap_mode='r'
     )[:, 0]
@@ -167,7 +176,7 @@ def get_spike_times(continuous_AP_dir) -> npt.NDArray:
     return spike_times
 
 
-def get_channel_positions(continuous_AP_dir) -> npt.NDArray:
+def get_channel_positions(continuous_AP_dir) -> npt.NDArray[np.float64]:
     channel_positions: npt.NDArray = np.load(
         continuous_AP_dir / 'channel_positions.npy', mmap_mode='r'
     )
@@ -313,7 +322,7 @@ In each continuous/AP dir, a spike_depths.npy file will be created.
 
 if __name__ == '__main__':
     
-    logger = np_logging.getLogger()
+    # logger = np_logging.getLogger()
 
     TEST_DIR = pathlib.Path(
         '//allen/programs/mindscope/workgroups/np-exp/1256079153_661728_20230321'
@@ -331,17 +340,19 @@ if __name__ == '__main__':
             
             # remove existing files
             for continuous_AP_dir in utils.sorted_continuous_AP_dirs(TEST_DIR):
-                (continuous_AP_dir / 'spike_depths.npy').unlink(missing_ok=True)
+                spike_depths_npy(continuous_AP_dir).unlink(missing_ok=True)
 
             # regenerate
             save_spike_depth_array_all_probes(TEST_DIR, skip_existing=False)
 
             # assert new files exist
             for continuous_AP_dir in utils.sorted_continuous_AP_dirs(TEST_DIR):
-                assert (continuous_AP_dir / 'spike_depths.npy').exists() and (
-                    continuous_AP_dir / 'spike_depths.npy'
-                ).stat().st_size > 0
-
+                assert (
+                    spike_depths_npy(continuous_AP_dir).exists() 
+                    and spike_depths_npy(continuous_AP_dir).stat().st_size > 0
+                ), f'Failed to create {spike_depths_npy(continuous_AP_dir)}'
+            print('All spike_depths.npy files created successfully.')
+            
         case 3: # test plotting
             show_spike_depth_map_all_probes(TEST_DIR)
         
