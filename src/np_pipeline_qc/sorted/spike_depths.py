@@ -253,7 +253,8 @@ def plot_spike_depth_map_single_probe(continuous_AP_dir: pathlib.Path) -> plt.Fi
     ax_main.set_ylim(depth_edges[0], depth_edges[-1])
     ax_main.spines['right'].set_visible(False)
     ax_main.spines['top'].set_visible(False)
-
+    ax_main.grid(False)
+    
     # cb = fig.colorbar(im, cax=ax_cbar, orientation='horizontal')
     # cb.outline.set_visible(False)
     # cb.ax.xaxis.tick_top()
