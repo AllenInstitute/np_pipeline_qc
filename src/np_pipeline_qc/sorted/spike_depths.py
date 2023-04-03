@@ -26,19 +26,28 @@ BATCH_SIZE = 50000
 """Number of spikes to process at a time. This is to avoid memory errors when
 processing."""
 
+
+def spike_depths_npy(continuous_AP_dir: pathlib.Path) -> pathlib.Path:
+    """Path to the spike depths file for a single probe."""
+    return continuous_AP_dir / 'spike_depths.npy'
+
+
 def generate_and_save_spike_depth_array_single_probe(continuous_AP_dir) -> None:
     spike_depths = get_spike_depth_array_single_probe(continuous_AP_dir)
-    np.save(continuous_AP_dir / 'spike_depths.npy', spike_depths)
+    np.save(spike_depths_npy(continuous_AP_dir), spike_depths)
 
 
-def save_all_spike_depth_arrays(parent_dir: pathlib.Path) -> None:
+def save_spike_depth_array_all_probes(parent_dir: pathlib.Path, skip_existing: bool = True) -> None:
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        executor.map(
-            generate_and_save_spike_depth_array_single_probe,
-            utils.sorted_continuous_AP_dirs(parent_dir),
-        )
-    # for continuous_AP_dir in utils.sorted_continuous_AP_dirs(parent_dir):
-    #     generate_and_save_spike_depth_arrays_single_probe(continuous_AP_dir)
+        for continuous_AP_dir in utils.sorted_continuous_AP_dirs(parent_dir):
+            probe_letter = utils.get_probe_letter_group_from_path(continuous_AP_dir)
+            spike_depths_path = spike_depths_npy(continuous_AP_dir)
+            if skip_existing and spike_depths_path.exists():
+                logger.info(f'Skipping generation: {spike_depths_path.relative_to(parent_dir)} already exists')
+                continue
+            logger.debug(f'Generating {spike_depths_path.relative_to(parent_dir)}')
+            executor.submit(generate_and_save_spike_depth_array_single_probe, continuous_AP_dir)
+
 
 @numba.njit(error_model='numpy')
 def calculate_spike_depths(
@@ -57,16 +66,6 @@ def calculate_spike_depths(
         np.transpose(ypos * features) / np.sum(features, axis=1),
         axis=0,
     )
-
-    # # if memory becomes an issue, use this method instead:
-    # return low_mem_calc(
-    #         sparse_features,
-    #         sparse_features_ind,
-    #         spike_templates,
-    #         spike_times,
-    #         channel_positions,
-    #     )
-
 
 def low_mem_calc_spike_depths(
     sparse_features,
@@ -112,14 +111,10 @@ def get_spike_depth_array_single_probe(
 ) -> npt.NDArray:
     """Generate spike depths for a given Kilosort output dir."""
 
-    logger.debug('Generating spike depths for %s', continuous_AP_dir)
-
-    logger.debug('Loading arrays...')
     arrays_for_spike_depth_calc = get_arrays_for_spike_depth_calc(
         continuous_AP_dir
     )
-
-    logger.debug('Calculating spike depths...')
+    return calculate_spike_depths(*arrays_for_spike_depth_calc)
     with contextlib.suppress(Exception):
         return calculate_spike_depths(*arrays_for_spike_depth_calc)
     return low_mem_calc_spike_depths(*arrays_for_spike_depth_calc)
@@ -198,6 +193,8 @@ def save_spike_depth_map_all_probes(
     plot_save_dir = pathlib.Path(plot_save_dir)
     plot_save_dir.mkdir(exist_ok=True, parents=True)
 
+    save_spike_depth_array_all_probes(session_dir_or_probe_dir, skip_existing=True)
+    
     prefix += '_' if (prefix and not prefix.endswith('_')) else ''
     for _ in utils.sorted_continuous_AP_dirs(session_dir_or_probe_dir):
         probe = utils.get_probe_letter_group_from_path(_)
@@ -310,7 +307,7 @@ In each continuous/AP dir, a spike_depths.npy file will be created.
         help='Path to a directory containing one or more subfolders of AP-band output files from Kilosort 2.',
     )
     session_dir_or_probe_dir = parser.parse_args().session_dir_or_probe_dir
-    save_all_spike_depth_arrays(session_dir_or_probe_dir)
+    save_spike_depth_array_all_probes(session_dir_or_probe_dir, skip_existing=True)
 
 
 if __name__ == '__main__':
@@ -336,7 +333,7 @@ if __name__ == '__main__':
                 (continuous_AP_dir / 'spike_depths.npy').unlink(missing_ok=True)
 
             # regenerate
-            save_all_spike_depth_arrays(TEST_DIR)
+            save_spike_depth_array_all_probes(TEST_DIR, skip_existing=False)
 
             # assert new files exist
             for continuous_AP_dir in utils.sorted_continuous_AP_dirs(TEST_DIR):
