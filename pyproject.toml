@@ -1,6 +1,6 @@
 [project]
 name = "np_pipeline_qc"
-version = "0.0.1"
+version = "0.0.2"
 description = "Analysis and visualization code for quality-control of Neuropixels pipeline data."
 authors = [
     { name = "corbennett", email = "corbettb@alleninstitute.org" },
@@ -58,49 +58,28 @@ async-timeout = ">=4.0.0"
 
 [project.optional-dependencies]
 dev = [
-    "blue",
     "isort",
     "mypy",
     "pytest",
     "pytest-cov",
-    "coverage",
-]
-
-#   scikit-image 0.16.2 failed
-#   h5py 2.10.0 failed
-#   matplotlib 3.5.3 failed
-#   pandas None -> 0.25.3 failed
-#   statsmodels 0.13.0 failed
-#   tables 3.6.1 failed
-#   opencv-python 4.7.0 failed
-#   numpy 1.24.2 -> 1.18.5 failed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[tool.pdm.dev-dependencies]
-dev = [
     "blue>=0.9.1",
-    "mypy>=1.1.1",
-    "isort>=5.12.0",
-    "pytest>=7.2.2",
+    "coverage[toml]>=7.2.2",
+    "pdm>=2.4.9",
+    "bump>=1.3.2",
+    "types-backports>=0.1.3",
+    "ruff>=0.0.260",
 ]
+
+[tool.pdm.scripts]
+# usage: pdm run <script> [args]
+ruff = "ruff --fix src"
+blue = "blue src"
+pytest = "pytest --cov"
+prebuild = {composite = ["blue", "ruff", "pytest"]}
+bump = "bump pyproject.toml" # defaults to patch; `pdm run bump -m` to bump minor
+build = {composite = ["prebuild", "pdm build"]}
+dry-run = {composite = ["prebuild", "pdm build", "pdm publish --no-build --repository https://test.pypi.org/simple"]}
+publish = {composite = ["pdm build", "pdm publish --no-build"]}
 
 [build-system]
 requires = [
