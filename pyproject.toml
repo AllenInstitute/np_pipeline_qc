@@ -11,17 +11,14 @@ maintainers = [
 dependencies = [
     "np-session>=0.4.26",
     "visual-behavior @ git+https://github.com/bjhardcastle/visual_behavior_analysis.git",
-    "beautifulsoup4>=4.12.0",
-    "pywin32>=306",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 readme = "README.md"
 
 [tool.pdm.resolution.overrides]
-matplotlib = ">=3.7.1"
+# matplotlib = ">=3.7.1"
+# numpy = ">=1.23.0, <1.24.0"
 async-timeout = ">=4.0.0"
-numpy = ">=1.23.0, <1.24.0"
-pywin32 = "306"
 # scikit-image = ">=0.20.0"
 # # packaging = ">=21.3"
 # aiohttp = ">=3.8.0"
@@ -51,7 +48,10 @@ dev = [
     "types-backports>=0.1.3",
     "ruff>=0.0.260",
 ]
-
+html = [
+    "beautifulsoup4",
+    "pywin32",
+]
 
 [tool.pdm.scripts]
 # usage: pdm run <script> [args]
