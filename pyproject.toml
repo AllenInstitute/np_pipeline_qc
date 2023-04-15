@@ -1,6 +1,6 @@
 [project]
 name = "np_pipeline_qc"
-version = "0.0.2"
+version = "0.0.1"
 description = "Analysis and visualization code for quality-control of Neuropixels pipeline data."
 authors = [
     { name = "corbennett", email = "corbettb@alleninstitute.org" },
@@ -10,30 +10,15 @@ maintainers = [
 ]
 dependencies = [
     "np-session>=0.4.26",
-    "visual-behavior @ git+https://github.com/bjhardcastle/visual_behavior_analysis.git",
+    "np-vba>=0.13.1"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.8, <3.11"
 readme = "README.md"
 
 [tool.pdm.resolution.overrides]
 # matplotlib = ">=3.7.1"
 # numpy = ">=1.23.0, <1.24.0"
-async-timeout = ">=4.0.0"
-# scikit-image = ">=0.20.0"
-# # packaging = ">=21.3"
-# aiohttp = ">=3.8.0"
-# llvmlite = ">=0.39.1"
-# numba = ">=0.56.4"
-# h5py = ">=3.8.0"
-# statsmodels = ">=0.13.5"
-# pandas = ">=1.5.3"
-# tables = ">=3.8.0"
-# pytz = "2022.7.1"
-# redis = ">=4.5.2"
-# # opencv-python = ">=4.7.0"
-# # nest-asyncio = ">=1.5.6"
-# # marshmallow = ">=3.10.0"
-# # pytz = "https://mypypi.org/packages/pytz-2020.9-py3-none-any.whl"  # absolute URL
+async-timeout = ">=4.0.0" # allensdk pins aiohttp==3.7.4 -> async-timeout^3
 
 [project.optional-dependencies]
 dev = [
