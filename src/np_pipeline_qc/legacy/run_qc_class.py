@@ -132,8 +132,7 @@ class run_qc:
             p for p in self.probes_to_run if p in self.paths['data_probes']
         ]
         self._run_modules()
-        if self.modules_to_run == 'all':
-            self._generate_report()
+        self._generate_report()
 
     def _generate_report(self):
         reports.session_qc_dir_to_img_html(self.FIG_SAVE_DIR)
