@@ -342,5 +342,3 @@ class BaseQC:
         )
 
 
-s = BaseQC(1179670730)
-s
