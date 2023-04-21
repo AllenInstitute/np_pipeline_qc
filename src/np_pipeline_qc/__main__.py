@@ -4,7 +4,6 @@ from typing import Type
 import np_logging
 import np_session
 
-from np_pipeline_qc.classes import BaseQC
 from np_pipeline_qc.legacy import run_qc_class
 
 logger = np_logging.getLogger(__name__)
@@ -44,12 +43,19 @@ if __name__ == '__main__':
         'session',
         type=np_session.Session,
         help='A lims session ID, or a string/path containing one',
-    )
+    )   
+    parser.add_argument(
+        'modules_to_run',
+        type=str,
+        nargs='*',
+        default='all',
+        help='A sequence of module names to run, separated with a space. "all" runs all modules',
+    )   
 
-    #! session = parser.parse_args().session
-    session = np_session.Session(np_session.Projects.TTN.get_latest_ephys())
+    kwargs = vars(parser.parse_args())
+    session = kwargs.pop('session')
 
-    run_qc(session)
+    run_qc(session, **kwargs)
 
     # TODO finish QC-class factory:
     # def qc_factory(session: int | str | np_session.Session) -> BaseQC:
