@@ -862,7 +862,7 @@ def plot_diode_measured_sync_square_flips(
         ax.set_aspect((np.diff(ax.get_xlim()) / np.diff(ax.get_ylim()))[0])
     
     prefix += '_' if not prefix.endswith('_') else ''
-    fig.savefig(os.path.join(FIG_SAVE_DIR, prefix + 'sync_square_flip_intervals.png')) 
+    save_figure(fig, os.path.join(FIG_SAVE_DIR, prefix + 'diode_sync_square_flip_intervals.png'))
     
     
 def plot_frame_intervals(
