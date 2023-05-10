@@ -170,9 +170,13 @@ def plot_tiled_rfs(
 
     for p in rfdict:
 
+        if all(value == [] for value in rfdict[p].values()):
+            logging.debug(f'No RFs for probe{p} - skipping')
+            continue
+
         peakchans = rfdict[p]['peak_channel']
         rfs = np.array(rfdict[p]['rfmat'])
-
+        
         lowest_chan = np.min(peakchans)
         highest_chan = np.max(peakchans)
 
