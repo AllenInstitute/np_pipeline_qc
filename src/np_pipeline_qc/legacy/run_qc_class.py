@@ -12,6 +12,7 @@ Created on Fri Jul 10 15:42:31 2020
 @author: svc_ccg
 """
 
+import datetime
 import glob
 import json
 import logging
@@ -19,6 +20,7 @@ import os
 import shutil
 from typing import Literal, Sequence
 
+import np_logging 
 import np_session
 import numpy as np
 import pandas as pd
@@ -32,7 +34,7 @@ from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 from np_pipeline_qc.legacy.task1_behavior_session import DocData
 from np_pipeline_qc.sorted import spike_depths
 
-logger = logging.getLogger(__name__)
+logger = np_logging.getLogger(__name__)
 
 class run_qc:
 
@@ -133,10 +135,20 @@ class run_qc:
         ]
         self._run_modules()
         self._generate_report()
-
+        self._email_notify_recent_session()
+        
     def _generate_report(self):
         reports.session_qc_dir_to_img_html(self.FIG_SAVE_DIR)
 
+    def _email_notify_recent_session(self): 
+        """Send an email with a link to the session QC report if the session
+        happened within the prev 24 hrs."""
+        if self.session.date >= datetime.date.today() - datetime.timedelta(days=1):
+            email = np_logging.email('EphysOperations@AllenInstitute.onmicrosoft.com')
+            email.info(
+                f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\n{self.session.npexp_path / "QC.lnk"}'
+                )
+            
     def _module_validation_decorator(data_streams):
         """Decorator to handle calling the module functions below and supplying
         the right data streams.
