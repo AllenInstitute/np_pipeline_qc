@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import html
-import importlib.resources
 import itertools
 import logging
 import pathlib
 import re
 import shutil
 
+
+import importlib_resources as resources
 import bs4
 import win32com.client
+import np_session
 
 from np_pipeline_qc.reports.assets.html_templates import DOC, FIG_TAG, JSON_TAG
 
@@ -29,7 +31,7 @@ SHORTCUT_FILENAME = 'QC'
 CSS_FILENAME = 'single_page_img_json_report'
 
 CSS = (
-    importlib.resources.files(__package__ or 'np_pipeline_qc')
+    resources.files(__package__ or 'np_pipeline_qc')
     / 'assets'
     / f'{CSS_FILENAME}.css'
 )
@@ -37,8 +39,8 @@ CSS = (
 
 
 def session_qc_dir_to_img_html(session_qc_root: str | pathlib.Path) -> None:
-    session = get_session_folder(session_qc_root)
-    session_qc_root = CORBETT_QC_ROOT / session
+    session = np_session.Session(str(session_qc_root))
+    session_qc_root = session.qc_path
     doc = bs4.BeautifulSoup(DOC, features='html.parser')
     doc.head.title.append(f'{session} {session_qc_root.parent.name}')
     doc.head.h1.append(f'{session} {session_qc_root.parent.name}')
@@ -46,7 +48,7 @@ def session_qc_dir_to_img_html(session_qc_root: str | pathlib.Path) -> None:
 
     def fmt(string: str) -> str:
         new = ''.join(string)
-        for s in session.split('_'):
+        for s in session.folder.split('_'):
             new = new.replace(s, '_')
         return new.replace('_', ' ').strip()
 
