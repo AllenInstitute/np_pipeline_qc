@@ -6,12 +6,12 @@ Created on Sun Sep 27 13:08:45 2020
 """
 
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 """
 Created on Fri Jul 10 15:42:31 2020
 
 @author: svc_ccg
 """
-from __future__ import annotations
 
 import datetime
 import glob
@@ -21,7 +21,7 @@ import os
 import shutil
 from typing import Literal, Sequence
 
-import np_logging 
+import np_logging
 import np_session
 import numpy as np
 import pandas as pd
@@ -147,7 +147,7 @@ class run_qc:
         if self.session.date >= datetime.date.today() - datetime.timedelta(days=1):
             email = np_logging.email('EphysOperations@AllenInstitute.onmicrosoft.com')
             email.info(
-                f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\n{self.session.npexp_path / "QC.lnk"}'
+                f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\nfile:{self.session.npexp_path / "QC.lnk"}'
                 )
             
     def _module_validation_decorator(data_streams):
