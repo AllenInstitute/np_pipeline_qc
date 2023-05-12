@@ -11,6 +11,7 @@ Created on Fri Jul 10 15:42:31 2020
 
 @author: svc_ccg
 """
+from __future__ import annotations
 
 import datetime
 import glob

@@ -328,15 +328,13 @@ if __name__ == '__main__':
         '//allen/programs/mindscope/workgroups/np-exp/1256079153_661728_20230321'
     )
     TEST = 2
-    match TEST:
-        
-        case 0: # no test
+    if TEST == 0: # no test
             main()
         
-        case 1: # doctests
+    if TEST == 1: # doctests
             doctest.testmod(verbose=True)
             
-        case 2: # test generating spike_depths.npy files
+    if TEST == 2: # test generating spike_depths.npy files
             
             # remove existing files
             for continuous_AP_dir in utils.sorted_continuous_AP_dirs(TEST_DIR):
@@ -353,10 +351,10 @@ if __name__ == '__main__':
                 ), f'Failed to create {spike_depths_npy(continuous_AP_dir)}'
             print('All spike_depths.npy files created successfully.')
             
-        case 3: # test plotting
+    if TEST == 3: # test plotting
             show_spike_depth_map_all_probes(TEST_DIR)
         
-        case 4: # test saving plots
+    if TEST == 4: # test saving plots
             with tempfile.TemporaryDirectory() as temp:
                 save_spike_depth_map_all_probes(TEST_DIR, temp)
                 

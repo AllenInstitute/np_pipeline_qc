@@ -98,7 +98,5 @@ if __name__ == '__main__':
     logger = np_logging.getLogger()
 
     TEST = 1
-    match TEST:
-        
-        case 1: # doctests
-            doctest.testmod(verbose=True)
+    if TEST == 1: # doctests
+        doctest.testmod(verbose=True)
