@@ -1,6 +1,6 @@
 ECHO off
 title Script to run post-experiment QC
-cd C:\Users\svc_neuropix\Documents\GitHub\np_pipeline_qc2
+cd C:\Users\svc_neuropix\Documents\GitHub\np_pipeline_qc
 ECHO activating environment
 call .venv\scripts\activate.bat
 ECHO All QC modules will be run
