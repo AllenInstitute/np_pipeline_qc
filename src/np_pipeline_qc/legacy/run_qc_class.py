@@ -145,7 +145,7 @@ class run_qc:
         """Send an email with a link to the session QC report if the session
         happened within the prev 24 hrs."""
         if self.session.date >= datetime.date.today() - datetime.timedelta(days=1):
-            email = np_logging.email('EphysOperations@AllenInstitute.onmicrosoft.com')
+            email = np_logging.email('EphysOperations@AllenInstitute.com')
             email.info(
                 f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\nfile:{self.session.npexp_path / "QC.lnk"}'
                 )
