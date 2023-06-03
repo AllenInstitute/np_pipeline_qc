@@ -390,10 +390,12 @@ def plot_rf(
     )
     first_rf_frame = first_frame_offset + rf_pre_blank_frames
     rf_frameTimes = frameAppearTimes[first_rf_frame:]
-    rf_trial_start_times = rf_frameTimes[
-        np.array(
+    sweep_frames = np.array(
             [f[0] for f in np.array(rfStimParams['sweep_frames'])]
         ).astype(np.int)
+    idx = sweep_frames<len(rf_frameTimes)
+    rf_trial_start_times = rf_frameTimes[
+        sweep_frames[idx]
     ]
 
     # extract trial stim info (xpos, ypos, ori)
@@ -402,7 +404,7 @@ def plot_rf(
     )   # table with rfstim parameters, indexed by sweep order to give stim for each trial
     sweep_order = np.array(rfStimParams['sweep_order'], dtype=object).astype(
         int
-    )  # index of stimuli for sweep_table for each trial
+    )[idx]  # index of stimuli for sweep_table for each trial
     # sweep_table = np.array(rfStimParams['sweep_table'])   #table with rfstim parameters, indexed by sweep order to give stim for each trial
     # sweep_order = np.array(rfStimParams['sweep_order'])   #index of stimuli for sweep_table for each trial
 
