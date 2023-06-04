@@ -736,7 +736,7 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
     )   # These are the on and off times for each stimulus (behavior, mapping, replay)
     all_vsyncs = sd.get_falling_edges(2, units='seconds')
 
-    # break the vsyncs up into three chunks (one for each stimulus)
+    # break the vsyncs up into chunks (one for each stimulus)
     vsyncs = []
     diode_vsyncs = []
     for son, soff in zip(stim_ons, stim_offs):
@@ -747,24 +747,30 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
         diode_vsyncs.append(stim_diode_vsyncs)
 
     # plot beginning of stims
-    fig, axes = plt.subplots(len(stim_ons))
-    if not isinstance(axes, list):
-        axes = list(axes)
-
+    fig, _ = plt.subplots(len(stim_ons))
+    axes = fig.axes
     fig.suptitle('Stim Starts')
     for ind, (son, vs, dvs) in enumerate(zip(stim_ons, vsyncs, diode_vsyncs)):
         print(ind)
+        labels = []
         axes[ind].plot(vs, 0.5 * np.ones(len(vs)), '|')
+        labels.append('stim vsyncs')
         axes[ind].plot(dvs, 0.5 * np.ones(len(dvs)), '|', ms=20)
+        labels.append('stim vsyncs[::60]')
         
         # focus on the start of vsyncs if they occur well after the stim-TTL onset
         x0, x1 = max(son - 1, vs[0] - 1), max(son + 2, vs[0] + 2)
         
         sd.plot_bit(4, x0, x1, axes=axes[ind], auto_show=False)
+        labels.append('diode-measured sync square')
         sd.plot_bit(5, x0, x1, axes=axes[ind], auto_show=False)
+        labels.append('stim running')
         axes[ind].set_xlim([x0, x1])
-        axes[ind].legend(['vsyncs', 'diode_vsyncs', 'diode', 'stim_running'])
-        axes[ind].get_legend().remove()
+        axes[ind].legend(labels, fontsize=8, loc='upper center', bbox_to_anchor=(0.5, 1.05), ncol=len(labels), fancybox=True)
+        if len(fig.axes) > 1:
+            axes[ind].set_title(f'visual stim {ind}', fontsize=8)
+            if ind:
+                axes[ind].get_legend().remove()
     save_figure(
         fig,
         os.path.join(
@@ -773,26 +779,31 @@ def plot_vsync_and_diode(syncDataset, FIG_SAVE_DIR, prefix=''):
     )
 
     # plot end of stims
-    fig, axes = plt.subplots(len(stim_offs))
-    if not isinstance(axes, list):
-        axes = list(axes)
+    fig, _ = plt.subplots(len(stim_offs))
+    axes = fig.axes
 
     fig.suptitle('Stim Ends')
     for ind, (soff, vs, dvs) in enumerate(
         zip(stim_offs, vsyncs, diode_vsyncs)
     ):
-
         axes[ind].plot(vs, 0.5 * np.ones(len(vs)), '|')
+        labels.append('stim vsyncs')
         axes[ind].plot(dvs, 0.5 * np.ones(len(dvs)), '|', ms=20)
-
+        labels.append('stim vsyncs[::60]')
+        
         # focus on the end of vsyncs if they occur well before the stim-TTL offset
         x0, x1 = min(soff - 2, vs[-1] - 2), min(soff + 1, vs[-1] + 1)
         
         sd.plot_bit(4, x0, x1, axes=axes[ind], auto_show=False)
+        labels.append('diode-measured sync square')
         sd.plot_bit(5, x0, x1, axes=axes[ind], auto_show=False)
+        labels.append('stim running')
         axes[ind].set_xlim([x0, x1])
-        axes[ind].legend(['vsyncs', 'diode_vsyncs', 'diode', 'stim_running'])
-        axes[ind].get_legend().remove()
+        axes[ind].legend(labels, fontsize=8, loc='upper center', bbox_to_anchor=(0.5, 1.05), ncol=len(labels), fancybox=True)
+        if len(fig.axes) > 1:
+            axes[ind].set_title(f'visual stim {ind}', fontsize=8)
+            if ind:
+                axes[ind].get_legend().remove()
 
     save_figure(
         fig,
@@ -819,8 +830,8 @@ def plot_diode_measured_sync_square_flips(
     
     # we want the diode flips that occur after the stim-running TTL goes high
     # and after the vsyncs start
-    all_diode_flips = np.concatenate([sd.get_rising_edges(4, units='seconds'), sd.get_falling_edges(4, units='seconds')])
-    all_vsyncs = sd.get_falling_edges(2, units='seconds')
+    all_diode_flips = np.concatenate([sd.get_rising_edges('stim_photodiode', units='seconds'), sd.get_falling_edges('stim_photodiode', units='seconds')])
+    all_vsyncs = sd.get_falling_edges('vsync_stim', units='seconds')
 
     # get the intervals in parts (one for each stimulus)
     diode_flips_per_stim = []
@@ -833,35 +844,35 @@ def plot_diode_measured_sync_square_flips(
             & (all_diode_flips > vsyncs[0]) & (all_diode_flips < vsyncs[-1])
             )]
         diode_flips_per_stim.append(sorted(diode_flips))
-
-    fig, axes = plt.subplots(1, len(stim_ons), sharey=True)
+        
+    num_diode_flips_per_stim = np.array([len(_) for _ in diode_flips_per_stim])
+    # add ` width_ratios=num_diode_flips/min(num_diode_flips)``
+    fig, axes = plt.subplots(1, len(stim_ons), sharey=True, gridspec_kw={'width_ratios': num_diode_flips_per_stim/min(num_diode_flips_per_stim)} )
     fig.set_tight_layout(False)
-    fig.suptitle('diode-measured sync-square\nflip intervals, 1 s expected')
-    if not isinstance(axes, list):
-        axes = list(axes)
+    fig.suptitle('diode-measured sync-square flip intervals, 1 s expected')
     y_deviations_from_one = []    
-    for idx, (ax, d) in enumerate(zip(axes, diode_flips_per_stim)):
+    for idx, (ax, d) in enumerate(zip(fig.axes, diode_flips_per_stim)):
         plt.sca(ax)
         intervals = np.diff(d)
         times = np.diff(d) / 2 + d[:-1]
         markerline, stemline, baseline = plt.stem(times, intervals, bottom=1.)
         plt.setp(stemline, linewidth=.5, alpha=.3)
-        plt.setp(markerline, markersize=.5)
+        plt.setp(markerline, markersize=.5, alpha=.8)
         plt.setp(baseline, visible=False)
         # plt.setp(baseline, linewidth=.5, c='k', alpha=.3, linestyle='--')
         
         y_deviations_from_one.extend(abs(1 - x) for x in ax.get_ylim())
-        ax.set_title(f'visual stim {idx}')
+        if len(fig.axes) > 1:
+            ax.set_title(f'visual stim {idx}', fontsize=8)
         ax.set_xlabel('time (s)')
         if idx == 0:
             ax.set_ylabel('flip interval (s)')
         
-    for ax in axes: 
+    for ax in fig.axes: 
         # after all ylims are established
         # center y-axis on 1.0
         dy_max = max(y_deviations_from_one)
         ax.set_ylim([1-dy_max, 1+dy_max])
-        ax.set_aspect((np.diff(ax.get_xlim()) / np.diff(ax.get_ylim()))[0])
     
     prefix += '_' if not prefix.endswith('_') else ''
     save_figure(fig, os.path.join(FIG_SAVE_DIR, prefix + 'diode_sync_square_flip_intervals.png'))
@@ -1831,6 +1842,8 @@ def plot_opto_responses(
     conds = np.unique(opto_stim_table['trial_conditions'])
 
     trial_start_times = opto_stim_table['trial_start_times']
+    trial_end_times = opto_stim_table['trial_end_times']
+    
     opto_mats_dict = {p: {} for p in probe_dict}
     for probe in probe_dict:
         u_df = probe_dict[probe]
@@ -1854,8 +1867,11 @@ def plot_opto_responses(
         # gs = gridspec.GridSpec(levels.size*2 + 1, conds.size, figure=fig)
         color_axes = []
         ims = []
-        cond_trial_duration = [0.2, 1.2]
-        cond_conv_kernel = [0.002, 0.01]
+        cond_trial_duration = np.array([
+            np.median(trial_end_times[_]-trial_start_times[_])
+            for _ in conds
+            ])
+        cond_conv_kernel = cond_trial_duration / 100
         for ic, cond in enumerate(conds):
             kernel_size = cond_conv_kernel[ic]
             this_waveform = opto_pkl['opto_waveforms'][cond]
@@ -1864,12 +1880,13 @@ def plot_opto_responses(
             ax_wave.plot(
                 np.arange(this_waveform.size) / opto_sample_rate, this_waveform
             )
-            ax_wave.set_xlim([-0.1, plot_duration - 0.1])
-            ax_wave.set_xticks(np.linspace(0, plot_duration - 0.1, 3))
+            pad_sec = 0.1 * plot_duration
+            ax_wave.set_xlim([-pad_sec, plot_duration + pad_sec])
+            ax_wave.set_xticks(np.linspace(0, plot_duration, 3))
             ax_wave.tick_params(
                 axis='x',  # changes apply to the x-axis
                 which='both',  # both major and minor ticks are affected
-                bottom=False,  # ticks along the bottom edge are off
+                bottom=True,  # ticks along the bottom edge are off
                 top=False,  # ticks along the top edge are off
                 labelbottom=False,
             )
@@ -1890,9 +1907,9 @@ def plot_opto_responses(
                     [
                         makePSTH_numba(
                             s.flatten(),
-                            trial_starts - 0.1,
-                            plot_duration,
-                            binSize=0.001,
+                            trial_starts - pad_sec,
+                            plot_duration + 2*pad_sec,
+                            binSize=plot_duration/1000,
                             convolution_kernel=kernel_size,
                             avg=True,
                         )
@@ -1901,9 +1918,10 @@ def plot_opto_responses(
                 )
 
                 # bin_times = psths[0, 1, :]
+                pad_ms = np.ceil(pad_sec * 1000)
                 psths = psths[unit_shank_order, 0, :].squeeze()
                 psths_baseline_sub = np.array(
-                    [p - np.mean(p[:100]) for p in psths]
+                    [p - np.mean(p[:int(pad_ms)]) for p in psths]
                 )
                 opto_mats_dict[probe][
                     str(cond) + '_' + str(level)
@@ -1922,9 +1940,9 @@ def plot_opto_responses(
                 ims.append(im)
                 # plt.colorbar(im)
                 if il == len(levels) - 1:
-                    ax.set_xticks(np.linspace(100, 1000 * plot_duration, 3))
+                    ax.set_xticks(np.linspace(pad_ms, 1000 * plot_duration + pad_ms, 3))
                     ax.set_xticklabels(
-                        np.linspace(0, 1000 * plot_duration - 100, 3)
+                        np.linspace(0, 1000 * plot_duration, 3)
                     )
                     ax.set_xlabel('Time from LED onset (ms)')
                     if ic == 0:
@@ -1939,6 +1957,7 @@ def plot_opto_responses(
         #        min_clim_val = np.min([im.get_clim()[0] for im in ims])
         #        max_clim_val = np.max([im.get_clim()[1] for im in ims])
 
+        # Add colorbar
         min_clim_val = -5
         max_clim_val = 50
 
