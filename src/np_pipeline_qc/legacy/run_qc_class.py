@@ -77,14 +77,7 @@ class run_qc:
             d = data_getters.lims_data_getter(exp_id=identifier)
 
         self.paths = d.data_dict
-        self.FIG_SAVE_DIR = os.path.join(
-            save_root,
-            self.paths['es_id']
-            + '_'
-            + self.paths['external_specimen_name']
-            + '_'
-            + self.paths['datestring'],
-        )
+        self.FIG_SAVE_DIR = save_root
         if not os.path.exists(self.FIG_SAVE_DIR):
             os.mkdir(self.FIG_SAVE_DIR)
 

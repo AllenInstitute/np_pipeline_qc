@@ -16,7 +16,7 @@ def run_qc(
     **kwargs,
 ) -> None:
     if not isinstance(session, np_session.Session):
-        session = np_session.Session(session)
+        session = np_session.PipelineSession(session)
 
     logger.info(
         f'Running QC for {session} | {"Hab" if session.is_hab else "Ephys"} | {session.project}'
@@ -33,7 +33,7 @@ def run_qc(
 
     # instantiating runs qc
     # str(`id`) > lims
-    cls(str(session.npexp_path), str(session.qc_path.parent), **kwargs)
+    cls(str(session.npexp_path), str(session.qc_path), **kwargs)
 
 
 if __name__ == '__main__':
