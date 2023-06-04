@@ -10,7 +10,6 @@ import shutil
 
 import importlib_resources as resources
 import bs4
-import win32com.client
 import np_session
 
 from np_pipeline_qc.reports.assets.html_templates import DOC, FIG_TAG, JSON_TAG
@@ -99,33 +98,12 @@ def session_qc_dir_to_img_html(session_qc_root: str | pathlib.Path) -> None:
 
     add_qc_contents(session_qc_root)
     save_path: pathlib.Path = session_qc_root / f'{HTML_FILENAME}.html'
-    create_shortcut_on_npexp_to(save_path)
     save_path.touch()
     # print(doc.prettify())
     save_path.write_bytes(doc.encode())
     shutil.copy(CSS, session_qc_root / CSS.name)
     print(f'Saved {save_path.relative_to(save_path.parent.parent.parent)}')
 
-
-def create_shortcut_on_npexp_to(path: pathlib.Path) -> None:
-    shell = win32com.client.Dispatch('WScript.Shell')
-    shortcut_path = (
-        NPEXP / get_session_folder(path) / f'{SHORTCUT_FILENAME}.lnk'
-    )
-    if shortcut_path.exists():
-        shortcut = shell.CreateShortCut(str(shortcut_path))
-        if shortcut.Targetpath == str(path):
-            return
-        if not pathlib.Path(shortcut.Targetpath).exists():
-            shortcut_path.unlink()
-        while shortcut_path.exists():
-            idx = 0 if 'idx' not in vars() else idx + 1
-            shortcut_path = shortcut_path.with_stem(
-                f'{SHORTCUT_FILENAME} ({path.parent.parent.name}).lnk'
-            )
-    shortcut = shell.CreateShortCut(str(shortcut_path))
-    shortcut.Targetpath = str(path)
-    shortcut.save()
 
 
 def get_session_folder(path: str | pathlib.Path) -> str | None:

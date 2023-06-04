@@ -1,6 +1,6 @@
 [project]
 name = "np_pipeline_qc"
-version = "0.0.10"
+version = "0.0.12"
 description = "Analysis and visualization code for quality-control of Neuropixels pipeline data."
 authors = [
     { name = "corbennett", email = "corbettb@alleninstitute.org" },
@@ -16,6 +16,7 @@ dependencies = [
     "importlib-resources>=5.12.0",
     "numba",
     "async-timeout<4.0",
+    "beautifulsoup4",
 ]
 requires-python = ">=3.8"
 readme = "README.md"
@@ -39,10 +40,6 @@ matplotlib = "<3.4.3, >=1.4.3"
 # run_pipeline_qc = "__main__:main" #! doesn't work: "cannot import main from __main__"
 
 [project.optional-dependencies]
-html = [
-    "beautifulsoup4",
-    "pywin32",
-]
 dev = [
     "np_pipeline_qc[html]",
     "isort",
