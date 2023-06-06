@@ -4,6 +4,7 @@ Created on Sat Feb 22 14:18:35 2020
 
 @author: svc_ccg
 """
+import datetime
 import copy
 import json
 import os
@@ -1666,6 +1667,60 @@ def lost_camera_frame_report(
     save_json(report, save_file)
 
 
+def camera_frame_grabs_simple(
+    paths,
+    FIG_SAVE_DIR,
+    prefix='',
+    num_frames_to_grab = 5,
+    sync_dataset=None,
+    cam_video_keys=None,
+):
+    """Just plots evenly spaced frames, no concept of epochs.
+    
+    video frames across cameras aren't synced currently.
+    """
+    if cam_video_keys is None:
+        cam_video_keys = [
+            ('RawBehaviorTrackingVideo', 'Behavior', 'beh_frame_received'),
+            ('RawEyeTrackingVideo', 'Eye', 'eye_frame_received'),
+            ('RawFaceTrackingVideo', 'Face', 'face_frame_received'),
+        ]
+
+    videos_present = [c for c in cam_video_keys if c[0] in paths]
+    num_videos = len(videos_present)
+
+
+    fig = plt.figure(constrained_layout=True, facecolor='0.5')
+    fig.set_size_inches([15, 7])
+    gs = gridspec.GridSpec(num_videos, num_frames_to_grab, figure=fig)
+    gs.update(wspace=0.0, hspace=0.0)
+    for idx_cam, (cam, camname, _) in enumerate(videos_present):
+        # get frames to plot
+        video_path = paths[cam]
+        v = cv2.VideoCapture(video_path)
+        
+        frame_delta = np.ceil(v.get(7) / num_frames_to_grab + 1)
+        frames_of_interest = np.arange(v.get(5), v.get(7), frame_delta)
+
+        for i, f in enumerate(frames_of_interest):
+            v.set(cv2.CAP_PROP_POS_FRAMES, int(f))
+            ret, frame = v.read()
+            ax = fig.add_subplot(gs[idx_cam, i])
+            ax.imshow(frame)
+            # ax.axis('off')
+            ax.tick_params(
+                top=False,
+                bottom=False,
+                left=False,
+                right=False,
+                labelleft=False,
+                labelbottom=False,
+            )
+            ax.set_title(datetime.timedelta(seconds=f/v.get(5)), fontsize=8)
+
+    save_figure(fig, os.path.join(FIG_SAVE_DIR, prefix + 'video_frames.png'))
+    # plt.tight_layout()
+    
 def camera_frame_grabs(
     paths,
     syncDataset,
@@ -1710,7 +1765,7 @@ def camera_frame_grabs(
         frames_of_interest = frames_to_grab[camname]
 
         for i, f in enumerate(frames_of_interest):
-            v.set(cv2.CAP_PROP_POS_FRAMES, f)
+            v.set(cv2.CAP_PROP_POS_FRAMES, f or 60)
             ret, frame = v.read()
             ax = fig.add_subplot(gs[ic, i])
             ax.imshow(frame)

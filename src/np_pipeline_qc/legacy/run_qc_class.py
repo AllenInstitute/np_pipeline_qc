@@ -138,9 +138,9 @@ class run_qc:
         """Send an email with a link to the session QC report if the session
         happened within the prev 24 hrs."""
         if self.session.date >= datetime.date.today() - datetime.timedelta(days=1):
-            email = np_logging.email([f'{n}@alleninstitute.org' for n in ('ben.hardcastle', 'severined')])
+            email = np_logging.email([f'{n}@alleninstitute.org' for n in ('ben.hardcastle', 'severined')], exception_only=True)
             email.info(
-                f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\nfile:{self.session.npexp_path / "QC.lnk"}'
+                f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\nfile:{self.session.qc_path / "qc.html"}'
                 )
             
     def _module_validation_decorator(data_streams):
@@ -754,21 +754,9 @@ class run_qc:
         analysis.lost_camera_frame_report(
             self.paths, video_dir, prefix=self.figure_prefix
         )
-        analysis.camera_frame_grabs(
+        analysis.camera_frame_grabs_simple(
             self.paths,
-            self.syncDataset,
             video_dir,
-            [
-                self.behavior_start_time,
-                self.mapping_start_time,
-                self.replay_start_time,
-            ],
-            [
-                self.behavior_end_time,
-                self.mapping_end_time,
-                self.replay_end_time,
-            ],
-            epoch_frame_nums=frames_for_each_epoch,
             prefix=self.figure_prefix,
         )
 
@@ -1010,13 +998,9 @@ class run_qc_passive(run_qc):
         analysis.lost_camera_frame_report(
             self.paths, video_dir, prefix=self.figure_prefix
         )
-        analysis.camera_frame_grabs(
+        analysis.camera_frame_grabs_simple(
             self.paths,
-            self.syncDataset,
             video_dir,
-            frame_times[:-1],
-            frame_times[1:],
-            epoch_frame_nums=frames_for_each_epoch,
             prefix=self.figure_prefix,
         )
 
@@ -1158,13 +1142,9 @@ class DR1(run_qc):
         analysis.lost_camera_frame_report(
             self.paths, video_dir, prefix=self.figure_prefix
         )
-        analysis.camera_frame_grabs(
+        analysis.camera_frame_grabs_simple(
             self.paths,
-            self.syncDataset,
             video_dir,
-            frame_times[:-1],
-            frame_times[1:],
-            epoch_frame_nums=frames_for_each_epoch,
             prefix=self.figure_prefix,
         )
 
