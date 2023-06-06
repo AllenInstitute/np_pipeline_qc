@@ -137,7 +137,10 @@ class run_qc:
     def _email_notify_recent_session(self): 
         """Send an email with a link to the session QC report if the session
         happened within the prev 24 hrs."""
-        if self.session.date >= datetime.date.today() - datetime.timedelta(days=1) and str(self.session.mous)e != '366122':
+        if (
+            self.session.date >= datetime.date.today() - datetime.timedelta(days=1)
+            and str(self.session.mouse) != '366122'
+        ):
             email = np_logging.email([f'{n}@alleninstitute.org' for n in ('ben.hardcastle', 'severined')], exception_only=True)
             
             email.info(
