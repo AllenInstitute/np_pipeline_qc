@@ -132,6 +132,10 @@ class run_qc:
         self._email_notify_recent_session()
         
     def _generate_report(self):
+        if self.errors:
+            analysis.save_json(
+                    {module: error for module, error in self.errors}, os.path.join(self.FIG_SAVE_DIR, 'qc_module_errors.json')
+                )
         reports.session_qc_dir_to_img_html(self.FIG_SAVE_DIR)
 
     def _email_notify_recent_session(self): 
@@ -351,7 +355,7 @@ class run_qc:
                     func()
                 except Exception as e:
                     print('Error running module {}'.format(module))
-                    self.errors.append((module, e))
+                    self.errors.append((module, repr(e)))
 
     def _build_unit_table(self):
         ### BUILD UNIT TABLE ####
@@ -1057,7 +1061,7 @@ class run_qc_passive(run_qc):
                         raise e
                     logger.info('Error running module %s', module)
                     logger.debug(e, exc_info=True)
-                    self.errors.append((module, e))
+                    self.errors.append((module, repr(e)))
 
 
 class DR1(run_qc):
