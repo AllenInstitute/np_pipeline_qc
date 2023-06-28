@@ -21,7 +21,9 @@ def run_qc(
     logger.info(
         f'Running QC for {session} | {"Hab" if session.is_hab else "Ephys"} | {session.project}'
     )
-
+    
+    delete_bad_qc_folders(session)
+    
     cls: Type[run_qc_class.run_qc]
 
     if session.is_hab:
@@ -34,7 +36,28 @@ def run_qc(
     # instantiating runs qc
     # str(`id`) > lims
     cls(str(session.npexp_path), str(session.qc_path), **kwargs)
-
+    
+def delete_bad_qc_folders(session):
+    for name in (
+        'qc.html', 
+        'qc.css',
+        'single_page_img_json_report.css',
+        'session_meta.json',
+        'specimen_meta.json',
+        ):
+        p = session.npexp_path / 'qc' / name
+        if p.is_dir():
+            for f in p.rglob('*'):
+                try:
+                    f.unlink()
+                except OSError:
+                    print(session, ' failed to delete ', f.name)
+                    continue
+            try:
+                p.unlink()
+            except OSError:
+                print(session, ' failed to delete ', p.name)
+                continue
 
 if __name__ == '__main__':
 
