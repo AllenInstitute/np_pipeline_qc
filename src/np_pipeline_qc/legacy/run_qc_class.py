@@ -18,6 +18,7 @@ import glob
 import json
 import logging
 import os
+import pathlib
 import shutil
 from typing import Literal, Sequence
 
@@ -1088,6 +1089,19 @@ class DR1(run_qc):
 
         return decorator
 
+    @property
+    def BEHAVIOR_PKL(self) -> str:
+        converted = pathlib.Path(
+            "//allen/programs/braintv/workgroups/nc-ephys/converted-pickles-060923"
+        ) / f'{self.session}.behavior.pkl'
+        if converted.exists():
+            return str(converted)
+        return self._behavior_pkl
+    
+    @BEHAVIOR_PKL.setter
+    def BEHAVIOR_PKL(self, value: str):
+        self._behavior_pkl = value
+        
     def _load_pkl_data(self):
         if not self.data_stream_status['sync'][0]:
             self._load_sync_data()
