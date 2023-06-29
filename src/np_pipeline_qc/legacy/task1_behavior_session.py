@@ -109,14 +109,27 @@ class DocData:
                     self.changeTrials[i] = True
                 if len(trial['stimulus_changes']) > 0:
                     if trial['stimulus_changes'][0][0][0] is not None:
-                        self.preImage[i] = trial['stimulus_changes'][0][0][0]
-                        self.postImage[i] = trial['stimulus_changes'][0][1][0]
-                        self.preContrast[i] = trial['stimulus_changes'][0][0][
-                            1
-                        ]['contrast']
-                        self.postContrast[i] = trial['stimulus_changes'][0][1][
-                            1
-                        ]['contrast']
+                        
+                        pre = trial['stimulus_changes'][0][0]
+                        post = trial['stimulus_changes'][0][1]
+                        self.preImage[i] = pre[0]
+                        self.postImage[i] = post[0]
+                        
+                        try:
+                            self.preContrast[i] = pre[1]['contrast']
+                            self.postContrast[i] = post[1]['contrast']
+                        except TypeError as exc:
+                            if not isinstance(pre[1], str):
+                                raise TypeError(
+                                    f'Unexpected type for pre/post stimulus_changes: {pre[1]}'
+                                    ) from exc
+                            if isinstance(self.preContrast, np.ndarray):
+                                # cannot put str in np array, make list of str
+                                self.preContrast = ['' for _ in self.trialLog]
+                                self.postContrast = ['' for _ in self.trialLog]
+                            self.preContrast[i] = pre[1]
+                            self.postContrast[i] = post[1]
+                            
                         self.preLabel[i] = (
                             self.preImage[i]
                             + ' ('
