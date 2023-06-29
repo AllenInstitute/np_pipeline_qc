@@ -339,24 +339,24 @@ def get_surface_channels(probe_dirs):
 
 
 def get_frame_offsets(sync_dataset, frame_counts, tolerance=0):
-    """Tries to infer which vsyncs correspond to the frames in the epochs in frame_counts
-    This allows you to align data even when there are aborted stimuli
+    ''' Tries to infer which vsyncs correspond to the frames in the epochs in frame_counts
+        This allows you to align data even when there are aborted stimuli
 
-    INPUTS:
-        sync_dataset: sync data from experiment (a 'Dataset' object made from the H5 file)
+        INPUTS:
+            sync_dataset: sync data from experiment (a 'Dataset' object made from the H5 file)
 
-        frame_counts: list of the expected frame counts (taken from pkl files) for each
-                    of the stimuli in question;
-                    the list should be ordered by the display sequence
+            frame_counts: list of the expected frame counts (taken from pkl files) for each
+                        of the stimuli in question;
+                        the list should be ordered by the display sequence
 
-        tolerance: percent by which frame counts are allowed to deviate from expected
+            tolerance: percent by which frame counts are allowed to deviate from expected
 
-    OUTPUTS:
-        start_frames: list of the inferred start frames for each of the stimuli
-    """
+        OUTPUTS:
+            start_frames: list of the inferred start frames for each of the stimuli
+    '''
 
     frame_counts = np.array(frame_counts)
-    tolerance = tolerance / 100.0
+    tolerance = tolerance/100.0
 
     # get vsyncs and stim_running signals from sync
     vf = get_vsyncs(sync_dataset)
@@ -369,44 +369,44 @@ def get_frame_offsets(sync_dataset, frame_counts, tolerance=0):
     epoch_frame_counts = []
     epoch_start_frames = []
     for start, end in zip(stimstarts, stimoffs):
-        epoch_frames = np.where((vf > start) & (vf < end))[0]
+        epoch_frames = np.where((vf>start)&(vf<end))[0]
         epoch_frame_counts.append(len(epoch_frames))
         epoch_start_frames.append(epoch_frames[0])
     print(epoch_frame_counts)
     print(frame_counts)
 
-    if len(epoch_frame_counts) > len(frame_counts):
-        logging.warning(
-            'Found extra stim presentations. Inferring start frames'
-        )
+    start_frames = []
+    for ind, fc in enumerate(frame_counts):
 
-        start_frames = []
-        for stim_num, fc in enumerate(frame_counts):
+        start_ind = np.where(epoch_frame_counts == fc)[0]
+        if len(start_ind)==0:
+            print(f'Could not find start frame for stimulus {ind}')
+            start_frames.append(np.nan)
+            continue
 
-            print('finding stim start for stim {}'.format(stim_num))
-            best_match = np.argmin(
-                [np.abs(e - fc) for e in epoch_frame_counts]
-            )
-            if (
-                fc * (1 - tolerance)
-                <= epoch_frame_counts[best_match]
-                <= fc * (1 + tolerance)
-            ):
-                _ = epoch_frame_counts.pop(best_match)
-                start_frame = epoch_start_frames.pop(best_match)
-                start_frames.append(start_frame)
-                print('found stim start at vsync {}'.format(start_frame))
+        start_frames.append(epoch_start_frames[int(start_ind)])
 
-            else:
-                logging.error(
-                    'Could not find matching sync frames for stim {}'.format(
-                        stim_num
-                    )
-                )
-                return
-
-    else:
-        start_frames = epoch_start_frames
+#    if len(epoch_frame_counts)>len(frame_counts):
+#        logging.warning('Found extra stim presentations. Inferring start frames')
+#        
+#        start_frames = []
+#        for stim_num, fc in enumerate(frame_counts):
+#            
+#            print('finding stim start for stim {}'.format(stim_num))
+#            best_match = np.argmin([np.abs(e-fc) for e in epoch_frame_counts])
+#            if fc*(1-tolerance) <= epoch_frame_counts[best_match] <= fc*(1+tolerance):
+#                _ = epoch_frame_counts.pop(best_match)
+#                start_frame = epoch_start_frames.pop(best_match)
+#                start_frames.append(start_frame)
+#                print('found stim start at vsync {}'.format(start_frame))
+#                
+#            else:
+#                logging.error('Could not find matching sync frames for stim {}'.format(stim_num))
+#                return
+#    
+#    
+#    else:        
+#        start_frames = epoch_start_frames
 
     return start_frames
 
