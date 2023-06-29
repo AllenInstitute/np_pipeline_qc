@@ -1134,7 +1134,7 @@ def plot_change_response_DR(
     prefix='',
     ctx_units_percentile=66,
 ):
-
+    block_change_frames = block_change_frames + behavior_start_frame
     block_change_times = [
         np.array(bl)[~np.isnan(bl)].astype(int) for bl in block_change_frames
     ]
