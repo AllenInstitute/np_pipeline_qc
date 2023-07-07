@@ -146,12 +146,13 @@ def get_RFs(
 
     if tile_rfs:
         print('tiling')
-        try:
-            plot_tiled_rfs(
-                rfs, FIG_SAVE_DIR, chan_bin, max_rows, max_cols, prefix
-            )
-        except Exception as E:
-            logging.error('Failed to tile rfs: {}'.format(E))
+        for probe in rfs:
+            try:
+                plot_tiled_rfs(
+                    {probe: rfs[probe]}, FIG_SAVE_DIR, chan_bin, max_rows, max_cols, prefix
+                )
+            except Exception as E:
+                logging.error(f'Failed to tile probe {probe} rfs: {E!r}')
 
     if save_rf_mat:
         rf_save_dir = r'\\allen\programs\braintv\workgroups\nc-ophys\corbettb\NP_behavior_pipeline\QC\rf_summary'
