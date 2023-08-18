@@ -90,12 +90,25 @@ class run_qc:
         )
 
         ### GET FILE PATHS TO SYNC AND PKL FILES ###
-        self.SYNC_FILE = self.paths.get('sync_file', 'none found')
+        self.SYNC_FILE = self.session.sync.as_posix()
         self.BEHAVIOR_PKL = self.paths.get('behavior_pkl', 'none found')
         self.REPLAY_PKL = self.paths.get('replay_pkl', 'none found')
         self.MAPPING_PKL = self.paths.get('mapping_pkl', 'none found')
         self.OPTO_PKL = self.paths.get('opto_pkl', 'none found')
 
+        # update video paths if none found
+        video_paths = {
+            'RawBehaviorTrackingVideo': self.session.behavior_video,
+            'RawBehaviorTrackingVideoMetadata': self.session.behavior_video_info,
+            'RawEyeTrackingVideo': self.session.eye_video,
+            'RawEyeTrackingVideoMetadata': self.session.eye_video_info,
+            'RawFaceTrackingVideo': self.session.face_video,
+            'RawFaceTrackingVideoMetadata': self.session.face_video_info,
+        }
+        for k,v in video_paths.items():
+            if not self.paths[k]:
+                self.paths[k] = v.as_posix()        
+        
         for f, s in zip(
             [
                 self.SYNC_FILE,
