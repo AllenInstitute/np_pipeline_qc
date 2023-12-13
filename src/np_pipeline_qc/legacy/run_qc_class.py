@@ -4,24 +4,18 @@ Created on Sun Sep 27 13:08:45 2020
 
 @author: svc_ccg
 """
-
-# -*- coding: utf-8 -*-
 from __future__ import annotations
-"""
-Created on Fri Jul 10 15:42:31 2020
 
-@author: svc_ccg
-"""
-
+import pathlib
 import datetime
 import glob
 import json
 import logging
 import os
-import pathlib
 import shutil
 from typing import Literal, Sequence
 
+import np_config
 import np_logging
 import np_session
 import numpy as np
@@ -69,15 +63,23 @@ class run_qc:
             'LFP': [False, self._build_lfp_dict],
         }
 
+        self.paths = {}
         identifier = exp_id
-        if identifier.find('_') >= 0:
-            d = data_getters.local_data_getter(
-                base_dir=identifier, cortical_sort=self.cortical_sort
-            )
-        else:
-            d = data_getters.lims_data_getter(exp_id=identifier)
-
-        self.paths = d.data_dict
+        try:
+            if identifier.find('_') >= 0:
+                d = data_getters.local_data_getter(
+                    base_dir=identifier, cortical_sort=self.cortical_sort
+                )
+            else:
+                d = data_getters.lims_data_getter(exp_id=identifier)
+            self.paths = d.data_dict
+        except KeyError: # no platform json file
+                self.paths['es_id'] = self.session.folder
+                self.paths['external_specimen_name'] = str(self.session.mouse)
+                self.paths['datestring'] = str(self.session.date).replace('-', '')
+                self.paths['rig'] = str(self.session.rig)
+                self.paths['sync_file'] = self.session.sync.as_posix()
+                
         self.FIG_SAVE_DIR = save_root
         if not os.path.exists(self.FIG_SAVE_DIR):
             os.mkdir(self.FIG_SAVE_DIR)
@@ -90,7 +92,7 @@ class run_qc:
         )
 
         ### GET FILE PATHS TO SYNC AND PKL FILES ###
-        self.SYNC_FILE = self.session.sync.as_posix()
+        self.SYNC_FILE = self.paths.get('sync_file', 'none found')
         self.BEHAVIOR_PKL = self.paths.get('behavior_pkl', 'none found')
         self.REPLAY_PKL = self.paths.get('replay_pkl', 'none found')
         self.MAPPING_PKL = self.paths.get('mapping_pkl', 'none found')
@@ -98,15 +100,15 @@ class run_qc:
 
         # update video paths if none found
         video_paths = {
-            'RawBehaviorTrackingVideo': self.session.behavior_video,
-            'RawBehaviorTrackingVideoMetadata': self.session.behavior_video_info,
-            'RawEyeTrackingVideo': self.session.eye_video,
-            'RawEyeTrackingVideoMetadata': self.session.eye_video_info,
-            'RawFaceTrackingVideo': self.session.face_video,
-            'RawFaceTrackingVideoMetadata': self.session.face_video_info,
+            'RawBehaviorTrackingVideo': self.session.get_behavior_video(),
+            'RawBehaviorTrackingVideoMetadata': self.session.get_behavior_video_info(),
+            'RawEyeTrackingVideo': self.session.get_eye_video(),
+            'RawEyeTrackingVideoMetadata': self.session.get_eye_video_info(),
+            'RawFaceTrackingVideo': self.session.get_face_video(),
+            'RawFaceTrackingVideoMetadata': self.session.get_face_video_info(),
         }
-        for k,v in video_paths.items():
-            if not self.paths[k]:
+        for k, v in video_paths.items():
+            if k not in self.paths:
                 self.paths[k] = v.as_posix()        
         
         for f, s in zip(
@@ -120,12 +122,18 @@ class run_qc:
         ):
             print(s + f)
 
-        self.probe_dirs = [
-            self.paths['probe' + pid] for pid in self.paths['data_probes']
-        ]
-        self.lfp_dirs = [
-            self.paths['lfp' + pid] for pid in self.paths['data_probes']
-        ]
+        try:
+            self.probe_dirs = [
+                self.paths['probe' + pid] for pid in self.paths['data_probes']
+            ]
+        except KeyError:
+            self.probe_dirs = []
+        try:
+            self.lfp_dirs = [
+                self.paths['lfp' + pid] for pid in self.paths['data_probes']
+            ]
+        except KeyError:
+            self.lfp_dirs = []
 
         self.probe_dict = None
         self.lfp_dict = None
@@ -137,10 +145,14 @@ class run_qc:
         self._get_platform_info()
         #        self._make_specimen_meta_json()
         #        self._make_session_meta_json()
-
-        self.probes_to_run = [
-            p for p in self.probes_to_run if p in self.paths['data_probes']
-        ]
+        
+        try:
+            self.probes_to_run = [
+                p for p in self.probes_to_run if p in self.paths['data_probes']
+            ]
+        except KeyError:
+            self.probes_to_run = []
+            
         self._run_modules()
         self._generate_report()
         self._email_notify_recent_session()
