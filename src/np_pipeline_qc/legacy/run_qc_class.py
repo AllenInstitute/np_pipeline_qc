@@ -171,7 +171,11 @@ class run_qc:
             self.session.date >= datetime.date.today() - datetime.timedelta(days=1)
             and str(self.session.mouse) != '366122'
         ):
-            email = np_logging.email([f'{n}@alleninstitute.org' for n in ('ben.hardcastle', 'severined')], exception_only=True)
+            if 'np-exp' in self.session.npexp_path.as_posix():
+                # pipeline sessions
+                email = np_logging.email([f'{n}@alleninstitute.org' for n in np_config.fetch('/projects/np_pipeline_qc')['email_users']], exception_only=True)
+            else:
+                email = np_logging.email([f'{n}@alleninstitute.org' for n in ('ben.hardcastle', 'corbettb')], exception_only=True)
             
             email.info(
                 f'QC report | {self.session} | {"Hab" if self.session.is_hab else "Ephys"} | {self.session.project}\nfile:{self.session.qc_path / "qc.html"}'
