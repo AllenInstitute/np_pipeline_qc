@@ -148,7 +148,9 @@ class run_qc:
         
         try:
             self.probes_to_run = [
-                p for p in self.probes_to_run if p in self.paths['data_probes']
+                p 
+                for p in self.probes_to_run
+                if p in self.paths['data_probes'] and f'probe{p}_metrics' in self.paths
             ]
         except KeyError:
             self.probes_to_run = []
