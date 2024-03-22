@@ -1,6 +1,6 @@
 [project]
 name = "np_pipeline_qc"
-version = "0.0.28"
+version = "0.0.29"
 description = "Analysis and visualization code for quality-control of Neuropixels pipeline data."
 authors = [
     { name = "corbennett", email = "corbettb@alleninstitute.org" },
