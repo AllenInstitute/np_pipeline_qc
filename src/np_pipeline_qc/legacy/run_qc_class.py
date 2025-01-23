@@ -13,6 +13,7 @@ import json
 import logging
 import os
 import shutil
+import traceback
 from typing import Literal, Sequence
 
 import np_config
@@ -387,8 +388,8 @@ class run_qc:
                 try:
                     func()
                 except Exception as e:
-                    print('Error running module {}'.format(module))
-                    self.errors.append((module, repr(e)))
+                    logger.exception('Error running module {}'.format(module))
+                    self.errors.append((module, traceback.format_exc()))
 
     def _build_unit_table(self):
         ### BUILD UNIT TABLE ####
@@ -1094,9 +1095,9 @@ class run_qc_passive(run_qc):
                 except Exception as e:
                     if self.debug:
                         raise e
-                    logger.info('Error running module %s', module)
-                    logger.debug(e, exc_info=True)
-                    self.errors.append((module, repr(e)))
+                    logger.exception('Error running module %s', module)
+                    # append full traceback
+                    self.errors.append((module, traceback.format_exc()))
 
 
 class DR1(run_qc):
