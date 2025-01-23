@@ -258,6 +258,7 @@ class run_qc:
             if not self.BEHAVIOR_PKL == 'none found'
             else None
         )
+        
         self.mapping_data = (
             pd.read_pickle(self.MAPPING_PKL)
             if not self.MAPPING_PKL == 'none found'
@@ -852,12 +853,14 @@ class run_qc_hab(run_qc):
         self.mapping_data = pd.read_pickle(self.MAPPING_PKL)
 
         ### CHECK FRAME COUNTS ###
-
         self.behavior_frame_count = (
             self.behavior_data['items']['behavior']['intervalsms'].size + 1
         )
-        self.mapping_frame_count = self.mapping_data['intervalsms'].size + 1
-        self.replay_frame_count = 0  # self.replay_data['intervalsms'].size + 1
+        if self.MAPPING_PKL != 'none found':
+            self.mapping_data = pd.read_pickle(self.MAPPING_PKL)
+            self.mapping_frame_count = self.mapping_data['intervalsms'].size + 1
+        else:
+            self.mapping_frame_count = 0
 
         self.total_pkl_frames = (
             self.behavior_frame_count
