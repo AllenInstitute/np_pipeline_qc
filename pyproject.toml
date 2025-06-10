@@ -18,6 +18,7 @@ dependencies = [
     "async-timeout<4.0",
     "beautifulsoup4",
     "np-tools>=0.1.20",
+    "psycopg2-binary==2.8.6",
 ]
 requires-python = ">=3.8"
 readme = "README.md"
