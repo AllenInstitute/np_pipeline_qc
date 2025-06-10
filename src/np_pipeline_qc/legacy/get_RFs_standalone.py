@@ -11,17 +11,14 @@ import pickle
 import sys
 
 import matplotlib.gridspec as gridspec
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
 import numpy as np
-
 # from visual_behavior.ophys.sync import sync_dataset
 import pandas as pd
 import scipy.signal
 from matplotlib import pyplot as plt
-
-import np_pipeline_qc.legacy.probeSync_qc as probeSync
 from np_pipeline_qc.legacy import analysis, data_getters
 from np_pipeline_qc.legacy.analysis import save_figure
-
 # sys.path.append("..")
 from np_pipeline_qc.legacy.sync_dataset import Dataset as sync_dataset
 
@@ -32,6 +29,7 @@ def get_RFs(
     first_frame_offset,
     FRAME_APPEAR_TIMES,
     FIG_SAVE_DIR,
+    pre_or_post,
     ctx_units_percentile=40,
     return_rfs=False,
     response_thresh=20,
@@ -45,9 +43,14 @@ def get_RFs(
     plot=True,
     stimulus_index=0,
 ):
-
+    prefix =''
+    if pre_or_post == 'pre_receptive_field_mapping':
+        prefix = 'pre_'
+    elif pre_or_post == 'post_receptive_field_mapping':
+        prefix = 'post_'
     ### PLOT POPULATION RF FOR EACH PROBE ###
     print('Return rfs set to {}'.format(return_rfs))
+    
     rfs = {
         p: {k: [] for k in ['peak_channel', 'unitID', 'rfmat']}
         for p in probe_dict
@@ -56,6 +59,7 @@ def get_RFs(
         try:
             print(f'########## Getting RFs for probe {p} ###########')
             u_df = probe_dict[p]
+           
             # good_units = u_df[(u_df['quality']=='good')&(u_df['snr']>1)]
             good_units = u_df[
                 (u_df['snr'] > 1)
@@ -75,6 +79,7 @@ def get_RFs(
                     s['times'].flatten(),
                     first_frame_offset,
                     FRAME_APPEAR_TIMES,
+                    pre_or_post,
                     stimulus_index=stimulus_index,
                 )
                 if filter_on_significant:
@@ -87,12 +92,12 @@ def get_RFs(
                     rfs[p]['rfmat'].append(rmat)
                     if s['peak_channel'] > ctx_bottom_chan:
                         ctx_rmats.append(rmat / rmat.max())
-
+            print(f'Got units for probe {p}')
             rmats_normed_mean = np.nanmean(ctx_rmats, axis=0)
 
             if plot:
                 rfig = plt.figure(constrained_layout=True, figsize=[6, 6])
-                title = p + ' population RF: {} units'.format(len(ctx_rmats))
+                title = prefix + p + ' population RF: {} units'.format(len(ctx_rmats))
                 rfig.suptitle(title, color='w')
 
                 nrows, ncols = 10, 10
@@ -136,7 +141,7 @@ def get_RFs(
                 save_path = os.path.join(
                     FIG_SAVE_DIR, prefix + p + ' population RF.png'
                 )
-                print(save_path)
+                
                 save_figure(rfig, save_path)
                 # rfig.savefig(os.path.join(FIG_SAVE_DIR, title + '.png'))
 
@@ -249,7 +254,7 @@ def get_significant_rf(rfmat, nreps=1000, conv=2):
 
 
 if __name__ == '__main__':
-
+    #this prob doesn't run in the qc 
     # run as standalone script
     print('trying to argparse')
     parser = argparse.ArgumentParser()
@@ -291,8 +296,9 @@ if __name__ == '__main__':
     SYNC_FILE = paths['sync_file']
     # BEHAVIOR_PKL = paths['behavior_pkl']
     # REPLAY_PKL = paths['replay_pkl']
-    MAPPING_PKL = paths['mapping_pkl']
-
+    #MAPPING_PKL = paths['mapping_pkl'] ##2/4/25
+    MAPPING_PKL = paths['behavior_pkl']
+    
     try:
         syncDataset = sync_dataset(SYNC_FILE)
     except Exception as e:
@@ -300,6 +306,7 @@ if __name__ == '__main__':
 
     try:
         mapping_data = pd.read_pickle(MAPPING_PKL)
+        print('got mapping pkl')
     except Exception as e:
         logging.error('Error reading mapping pkl file: {}'.format(e))
 
@@ -307,9 +314,14 @@ if __name__ == '__main__':
 
     ### PLOT FRAME INTERVALS ###
     vr, vf = probeSync.get_sync_line_data(syncDataset, channel=2)
-
-    # behavior_frame_count = behavior_data['items']['behavior']['intervalsms'].size + 1
-    mapping_frame_count = mapping_data['intervalsms'].size + 1
+    print('THIS PART ACTUALLY HAPPENS')
+    # behavior_frame_count = behavior_data['items']['behavior']['intervalsms'].size + 1 #maybe I can get rid of all this
+    # mapping_frame_count = mapping_data['intervalsms'].size + 1
+    mapping_frame_count = mapping_data["items"]["behavior"]["items"][
+            "post_receptive_field_mapping" #"post_receptive_field_mapping"
+        ]["static_stimulus"][
+            "total_frames"
+        ] ##psycode 2/4/2025
     # replay_frame_count = replay_data['intervalsms'].size + 1
 
     MONITOR_LAG = 0.036
@@ -326,7 +338,7 @@ if __name__ == '__main__':
     # infer start frames for stimuli
     start_frame = probeSync.get_frame_offsets(
         syncDataset, [mapping_frame_count]
-    )
+    ) #might not need this either
 
     if start_frame is not None:
         print(

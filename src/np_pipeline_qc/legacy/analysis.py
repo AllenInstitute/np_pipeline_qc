@@ -4,8 +4,8 @@ Created on Sat Feb 22 14:18:35 2020
 
 @author: svc_ccg
 """
-import datetime
 import copy
+import datetime
 import json
 import os
 import re
@@ -14,6 +14,7 @@ import shutil
 import cv2
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
+import np_pipeline_qc.legacy.probeSync_qc as probeSync
 import numpy as np
 import pandas as pd
 import plotly
@@ -22,13 +23,11 @@ import scipy.signal
 import visual_behavior
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
-from numba import njit
-
-import np_pipeline_qc.legacy.probeSync_qc as probeSync
 from np_pipeline_qc.legacy import ecephys
 from np_pipeline_qc.legacy.get_sessions import glob_file
 from np_pipeline_qc.legacy.probeSync_qc import get_sync_line_data
 from np_pipeline_qc.legacy.sync_dataset import Dataset as SyncDataset
+from numba import njit
 
 probe_color_dict = {
     'A': 'orange',
@@ -378,27 +377,32 @@ def plot_rf(
     spikes,
     first_frame_offset,
     frameAppearTimes,
+    pre_or_post,
     resp_latency=0.025,
     plot=True,
     returnMat=False,
     stimulus_index=0,
 ):
-
+    print('pre_or_post check in analysis: ', pre_or_post)
     rfFlashStimDict = mapping_pkl_data
-    rfStimParams = rfFlashStimDict['stimuli'][stimulus_index]
-    rf_pre_blank_frames = int(
-        rfFlashStimDict['pre_blank_sec'] * rfFlashStimDict['fps']
-    )
+    
+    rfStimParams = rfFlashStimDict['items']['behavior']['items'][pre_or_post]['static_stimulus'] #'post_receptive_field_mapping'
+    #rfStimParams = rfFlashStimDict['stimuli'][stimulus_index] #just change this to the new mapping file
+    rf_pre_blank_frames = 0 ##CHANGED 2/3/25 FOR PSYCODE
+    # rf_pre_blank_frames = int( 
+    #      rfFlashStimDict['pre_blank_sec'] * rfFlashStimDict['fps']
+    #  )
     first_rf_frame = first_frame_offset + rf_pre_blank_frames
+    first_rf_frame = 0 #psycode 25, doesn't even matter anymore lol
     rf_frameTimes = frameAppearTimes[first_rf_frame:]
     sweep_frames = np.array(
             [f[0] for f in np.array(rfStimParams['sweep_frames'])]
         ).astype(np.int)
+    frame_indices = np.array(rfFlashStimDict['items']['behavior']['items'][pre_or_post]['frame_indices'])
     idx = sweep_frames<len(rf_frameTimes)
     rf_trial_start_times = rf_frameTimes[
-        sweep_frames[idx]
+        frame_indices[sweep_frames]
     ]
-
     # extract trial stim info (xpos, ypos, ori)
     sweep_table = np.array(
         rfStimParams['sweep_table'], dtype=object

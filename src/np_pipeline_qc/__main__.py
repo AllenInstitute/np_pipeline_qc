@@ -30,9 +30,15 @@ def run_qc(
         cls = run_qc_class.run_qc_hab
     elif session.project in np_session.Projects.DR.value:
         cls = run_qc_class.DR1
+    elif session.project == 'OpenScopePsycode':
+        cls = run_qc_class.run_qc_psycode
+    
     else:
         cls = run_qc_class.run_qc_passive
 
+    #set class manually here
+    cls = run_qc_class.run_qc_hab
+    
     # instantiating runs qc
     # str(`id`) > lims
     cls(str(session.npexp_path), str(session.qc_path), **kwargs)

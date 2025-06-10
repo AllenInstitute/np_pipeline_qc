@@ -700,7 +700,7 @@ def get_experiment_frame_times(sync, photodiode_cycle=60, method='ccb'):
     vsync_times = sync.get_falling_edges('vsync_stim', 'seconds')
     stimstarts, stimends = get_stim_starts_ends(sync)
     ccb_frame_times = []
-
+    print(f"{len(stimstarts)=}, {len(stimends)=}")
     for ie, (start, end) in enumerate(zip(stimstarts, stimends)):
 
         epoch_vsyncs = vsync_times[
